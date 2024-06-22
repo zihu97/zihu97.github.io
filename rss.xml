@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="https://zihu.github.io/rss.xsl"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <atom:link href="https://zihu.github.io/rss.xml" rel="self" type="application/rss+xml"/>
+    <title>紫狐</title>
+    <link>https://zihu.github.io/</link>
+    <description>紫狐的个人博客</description>
+    <language>zh-CN</language>
+    <pubDate>Sat, 22 Jun 2024 14:55:01 GMT</pubDate>
+    <lastBuildDate>Sat, 22 Jun 2024 14:55:01 GMT</lastBuildDate>
+    <generator>vuepress-plugin-feed2</generator>
+    <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+    <category>技术日志</category>
+    <category>生活随笔</category>
+    <category>Linux</category>
+    <item>
+      <title>VuePress博客教程</title>
+      <link>https://zihu.github.io/posts/code/vuepresshope.html</link>
+      <guid>https://zihu.github.io/posts/code/vuepresshope.html</guid>
+      <source url="https://zihu.github.io/rss.xml">VuePress博客教程</source>
+      <description>VuePress博客教程 VuePress是一个vue驱动的静态网站生成器，非常适合来写静态文档，当然也可以拿来编写个人博客，配合第三方开发的主题可以做出非常精美的静态网站。</description>
+      <category>技术日志</category>
+      <pubDate>Tue, 12 Jul 2022 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[<h1> VuePress博客教程</h1>
+<figure><img src="https://vuepress.vuejs.org/hero.png" alt="" tabindex="0" loading="lazy"><figcaption></figcaption></figure>
+<p>VuePress是一个vue驱动的静态网站生成器，非常适合来写静态文档，当然也可以拿来编写个人博客，配合第三方开发的主题可以做出非常精美的静态网站。</p>
+<hr>
+<!-- more -->
+<br>
+<p>本文主要介绍的是如何使用VuePress编写个人博客，由于默认主题比较的简洁，可以考虑采用第三方主题，这里推荐使用<a href="https://theme-hope.vuejs.press/zh/" target="_blank" rel="noopener noreferrer">vuepress-theme-hope</a>，它有以下优点：</p>
+<ul>
+<li>开箱即用</li>
+<li>完整的博客功能</li>
+<li>markdown增强</li>
+<li>文章信息统计</li>
+<li>众多插件支持</li>
+<li>图片预览</li>
+<li>Vue3+TypeScript</li>
+<li>以及众多的其他优点</li>
+</ul>
+<p>该主题提供非常多的功能，可以让省去很多麻烦的配置，专注于文档编写，并且该主题作者也是VuePress项目成员之一。</p>
+<br>
+<h2> 安装</h2>
+<p>创建vuepress-theme-hope 项目，选择你自己的包管理器：</p>
+
+<p>过程中会要求配置一些东西，过程中会有一个选项选择项目类型，<code>blog</code>博客或者<code>docs</code>文档，根据自己的需求选择就好，然后等待一会儿就可以完成项目的创建。</p>
+<br>
+<h2> 配置</h2>
+<div class="language-typescript line-numbers-mode" data-ext="ts"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>完成项目创建后，<code>.vuepress</code>是项目的配置文件夹，下面是一些文件夹的作用：</p>
+<ul>
+<li><code>.cahce</code> ：用于缓存文件的文件夹</li>
+<li><code>.temp</code>：存放临时文件的文件夹</li>
+<li><code>dist</code>：存放打包文件的文件夹</li>
+<li><code>public</code>：存放公共静态资源的文件夹</li>
+<li><code>navbar</code>：存放导航栏配置的文件夹</li>
+<li><code>sidebar</code>：存放侧边栏配置的文件夹</li>
+<li><code>styles</code>：存放项目的样式文件</li>
+<li><code>config.ts</code>：主要配置文件</li>
+<li><code>theme.ts</code>：项目主题配置文件</li>
+</ul>
+<p>对于博客而言，首先需要确保<code>theme.ts</code>文件内的插件配置<code>blog</code>项为<code>true</code></p>
+<div class="language-typescript line-numbers-mode" data-ext="ts"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3> 主页</h3>
+<p><code>REAMDE.md</code>也要根据博客来进行相应的修改</p>
+<div class="language-markdown line-numbers-mode" data-ext="md"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>关于博客主页的详细的<code>Frontmatter</code>配置可以前往<a href="https://theme-hope.vuejs.press/zh/config/frontmatter/blog-home.html" target="_blank" rel="noopener noreferrer">博客主页 Frontmatter 配置 | vuepress-theme-hope (vuejs.press)</a>。</p>
+<br>
+<h2> 图片</h2>
+<p>vuepress-theme-hope主题对于图片有很好的支持，且支持：</p>
+<ul>
+<li>左右滑动按顺序浏览页面内其他的图片</li>
+<li>查看图片的描述</li>
+<li>对图片进行缩放</li>
+<li>全屏浏览图片</li>
+<li>下载图片</li>
+<li>分享图片</li>
+</ul>
+<p>在编写md文件时，只需要将文件放入<code>public</code>文件夹内，然后通过<code>/</code>开头的路径访问即可，例如<code>test</code>图片位于<code>/public/test/test.png</code>，那么对于的markdown如下</p>
+<div class="language-markdown line-numbers-mode" data-ext="md"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div></div></div><p>当在主题选项中设置 <code>plugin.mdEnhance.imgSize: true</code> 时，可以使用 <code>=widthxheight</code> 指定图像大小。</p>
+<div class="language-markdown line-numbers-mode" data-ext="md"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>更多图片用法可以前往<a href="https://theme-hope.vuejs.press/zh/guide/markdown/image.html" target="_blank" rel="noopener noreferrer">图片 | vuepress-theme-hope (vuejs.press)</a>。</p>
+<div class="hint-container tip">
+<p class="hint-container-title">提示</p>
+<p>这里需要注意的是，该主题摘要部分的图片渲染有点问题，所以建议使用Gitee作为图床，Github搭建站点。</p>
+</div>
+<br>
+<h2> 博客页面路径</h2>
+<p>博客提供的默认路径如下，如果它们与你的已有路径发生冲突，并且你不想调整自己的路径，你可以对它们进行修改。</p>
+<table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>描述</th>
+<th>默认路径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>article</code></td>
+<td>文章列表</td>
+<td><code>/article/</code></td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>分类地图页</td>
+<td><code>/category/</code></td>
+</tr>
+<tr>
+<td><code>categoryItem</code></td>
+<td>特定分类列表</td>
+<td><code>/category/:name/</code></td>
+</tr>
+<tr>
+<td><code>tag</code></td>
+<td>标签地图页</td>
+<td><code>/tag/</code></td>
+</tr>
+<tr>
+<td><code>tagItem</code></td>
+<td>特定标签列表</td>
+<td><code>/tag/:name/</code></td>
+</tr>
+<tr>
+<td><code>star</code></td>
+<td>星标文章列表</td>
+<td><code>/star/</code></td>
+</tr>
+<tr>
+<td><code>timeline</code></td>
+<td>时间线列表</td>
+<td><code>/timeline/</code></td>
+</tr>
+</tbody>
+</table>
+<h2> Markdown增强</h2>
+<p>这块功能特别强大，东西非常多，建议去官网自己看。<a href="https://theme-hope.vuejs.press/zh/guide/markdown/intro.html" target="_blank" rel="noopener noreferrer">启用 Markdown 增强 | vuepress-theme-hope (vuejs.press)</a></p>
+<br>
+<h2> 文章信息</h2>
+<p>使用<code>frontmatter</code>可以控制文章的一些基本属性，下面是一个例子。</p>
+<div class="language-markdown line-numbers-mode" data-ext="md"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p><code>date</code>：日期</p>
+<p><code>article</code>：是否添加进文章列表</p>
+<p><code>start</code>：是否收藏，也可以是数字，数字越大排序权重越高</p>
+<p><code>sticky</code>：是否置顶，也可以是数字，数字越大排序权重越高</p>
+<p><code>category</code>：分类，YAML列表格式</p>
+<p><code>tag</code>：标签，YAML列表格式</p>
+<p>更多配置项可以前往<a href="https://theme-hope.vuejs.press/zh/config/frontmatter/info.html" target="_blank" rel="noopener noreferrer">信息 Frontmatter 配置 | vuepress-theme-hope (vuejs.press)</a>。</p>
+<h2> 功能</h2>
+<h3> 阅读时间</h3>
+<p>配置<code>theme.tx</code>下的<code>plugins.readingTime.wordPerMinute</code>，如下</p>
+<div class="language-typescript line-numbers-mode" data-ext="ts"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><br>
+<h3> 评论</h3>
+<p>主题支持Gisus，Waline，Twikoo，Artalk，四种评论插件，这里为了方便我们就采用Giscus，利用GitHub dicussion制作的评论，其他三种都需要额外去对应官方申请应用，Giscus是完全开源免费的，对于我们个人博客而言已经完全足够使用了。</p>
+<ul>
+<li><a href="https://giscus.app/zh-CN" target="_blank" rel="noopener noreferrer">giscus主页</a></li>
+<li><a href="https://plugin-comment2.vuejs.press/zh/config/giscus.html" target="_blank" rel="noopener noreferrer">Giscus 选项 | 评论插件 (vuejs.press)</a></li>
+</ul>
+<p>前提是你需要先安装 <a href="https://github.com/apps/giscus" target="_blank" rel="noopener noreferrer">Giscus App</a>，使其有权限访问对应仓库，然后需要创建一个公开的GitHub仓库，并且开启Discussion功能，在仓库中的settings中开启即可。然后在Giscus官网中填写仓库名称，和分类，还有一些配置项，根据自己的喜好来即可，最后giscus会生成一个<code>&lt;script&gt;</code>标签，不过我们并不需要该标签，只需要获取其中的<code>data-reop</code>，<code>data-repo-id</code>，<code>data-category</code>，<code>data-category-id</code> 这四个属性即可。然后填入<code>theme.ts</code>中的<code>plugins</code>项中，如下：</p>
+<div class="language-typescript line-numbers-mode" data-ext="ts"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>除此之外还有一些其他的外观配置项，请自行了解，配置完毕后重启应用，访问一篇文章通过Oauth2登录Github即可评论。</p>
+<br>
+<h2> 插件</h2>
+<p>vuepress-theme-hope提供了许多可以使用的主题，这些主题都需要额外的安装才能使用，下面是一些常用的主题。</p>
+<br>
+<h3> 搜索</h3>
+<p>安装 <code>vuepress-plugin-search-pro</code>：</p>
+
+<p>从 <code>vuepress-plugin-search-pro</code> 导入 <code>searchProPlugin</code> 并将其应用至 <code>config.ts</code> 下的 <code>plugins</code> 选项：</p>
+<div class="language-typescript line-numbers-mode" data-ext="ts"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>重启项目，然后就可以在导航栏上看到搜索框了。</p>
+<br>
+<div class="hint-container tip">
+<p class="hint-container-title">提示</p>
+<p>经过以上的配置后，已经达到一个基本的博客要求了，但是除去上面这些功能之外，vuepress-theme-hope还有很多有趣的功能和插件，请自行前往官网了解。</p>
+</div>
+<h2> 部署</h2>
+<p>部署的话对于这种小体量静态网站，没有必要去购买专门的云服务器，可以直接使用Github Page功能，或者国内访问更快的Gitee。这里使用的是Github Workflows自动部署。</p>
+<div class="language-yaml line-numbers-mode" data-ext="yml"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>推送完代码后Github会自动执行Actions，然后将网站打包的内容推送到<code>gh-pages</code>分支，然后Github会自动更新静态网站的内容。</p>
+<div class="hint-container tip">
+<p class="hint-container-title">提示</p>
+<p>需要注意的是要开启Github Action允许修改仓库的权限。</p>
+</div>
+]]></content:encoded>
+      <enclosure url="https://vuepress.vuejs.org/hero.png" type="image/png"/>
+    </item>
+    <item>
+      <title>海边的一段代码</title>
+      <link>https://zihu.github.io/posts/life/2023_01_22.html</link>
+      <guid>https://zihu.github.io/posts/life/2023_01_22.html</guid>
+      <source url="https://zihu.github.io/rss.xml">海边的一段代码</source>
+      <description>海边的一段代码 过年的时候在厦门的海滩上，别人都在写和谁谁相爱一辈子，而我写了一段代码。</description>
+      <category>生活随笔</category>
+      <pubDate>Sun, 22 Jan 2023 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[<h1> 海边的一段代码</h1>
+<figure><img src="https://public-1308755698.cos.ap-chongqing.myqcloud.com//img/202310111956319.png" alt="" tabindex="0" loading="lazy"><figcaption></figcaption></figure>
+<p>过年的时候在厦门的海滩上，别人都在写和谁谁相爱一辈子，而我写了一段代码。</p>
+<!-- more -->
+<hr>
+]]></content:encoded>
+      <enclosure url="https://public-1308755698.cos.ap-chongqing.myqcloud.com//img/202310111956319.png" type="image/png"/>
+    </item>
+    <item>
+      <title>ubuntu自定义系统服务</title>
+      <link>https://zihu.github.io/posts/code/linux/linuxservice.html</link>
+      <guid>https://zihu.github.io/posts/code/linux/linuxservice.html</guid>
+      <source url="https://zihu.github.io/rss.xml">ubuntu自定义系统服务</source>
+      <description>ubuntu自定义系统服务</description>
+      <category>Linux</category>
+      <pubDate>Sat, 28 Jan 2023 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[<h1> ubuntu自定义系统服务</h1>
+<img src="https://public-1308755698.cos.ap-chongqing.myqcloud.com//img/202310111508436.png" style="zoom: 150%;">
+<!-- more -->
+<hr>
+<p>在开发项目时，对于一些后台应用，可以自定义成linux的service，这样能够更加方便的管理。</p>
+<p>首先在<code>/etc/systemd/system</code>下，创建一个<code>xxx.service</code>的文件，<code>xxx</code>是服务名。</p>
+<p>service文件有特殊的配置格式，下面是一个简单的例子</p>
+<div class="language-txt line-numbers-mode" data-ext="txt"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>其中<code>type</code>有以下几种取值</p>
+<ul>
+<li>
+<p>Type=simple：默认值，执行ExecStart指定的命令，启动主进程</p>
+</li>
+<li>
+<p>Type=forking：以 fork 方式从父进程创建子进程，创建后父进程会立即退出</p>
+</li>
+<li>
+<p>Type=oneshot：一次性进程，Systemd 会等当前服务退出，再继续往下执行</p>
+</li>
+<li>
+<p>Type=dbus：当前服务通过D-Bus启动</p>
+</li>
+<li>
+<p>Type=notify：当前服务启动完毕，会通知Systemd，再继续往下执行</p>
+</li>
+<li>
+<p>Type=idle：若有其他任务执行完毕，当前服务才会运行，即后台运行</p>
+</li>
+</ul>
+<p>Restart：定义了退出后，Systemd 的重启方式。可以设置的值如下：</p>
+<ul>
+<li>
+<p>no（默认值）：退出后不会重启；</p>
+</li>
+<li>
+<p>on-success：当进程正常退出时（退出状态码为0），才会重启；</p>
+</li>
+<li>
+<p>on-failure：当进程非正常退出时(退出状态码非0)，包括被信号终止和超时，才会重启；</p>
+</li>
+<li>
+<p>on-abnormal：当被信号终止和超时，才会重启；</p>
+</li>
+<li>
+<p>on-abort：当收到没有捕捉到的信号终止时，才会重启；</p>
+</li>
+<li>
+<p>on-watchdog：看门狗超时退出，才会重启；</p>
+</li>
+<li>
+<p>always：总是重启。</p>
+</li>
+</ul>
+<p>KillMode：定义 Systemd 如何停止服务，可以设置的值如下：</p>
+<ul>
+<li>
+<p>control-group（默认值）：当前控制组里面的所有子进程，都会被杀掉；</p>
+</li>
+<li>
+<p>process：只杀主进程；</p>
+</li>
+<li>
+<p>mixed：主进程将收到 SIGTERM 信号，子进程收到 SIGKILL 信号；</p>
+</li>
+<li>
+<p>none：没有进程会被杀掉。</p>
+</li>
+</ul>
+<p>创建完成后，执行命令重新加载服务文件</p>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div></div></div><p>随后使用<code>service hello service </code> 即可开启</p>
+]]></content:encoded>
+    </item>
+  </channel>
+</rss>
