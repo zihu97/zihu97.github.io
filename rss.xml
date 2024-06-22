@@ -6,15 +6,15 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Sat, 22 Jun 2024 15:35:40 GMT</pubDate>
-    <lastBuildDate>Sat, 22 Jun 2024 15:35:40 GMT</lastBuildDate>
+    <pubDate>Sat, 22 Jun 2024 15:44:09 GMT</pubDate>
+    <lastBuildDate>Sat, 22 Jun 2024 15:44:09 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
     <item>
       <title>VuePress博客教程</title>
-      <link>https://zihu97.github.io/posts/code/vuepresshope.html</link>
-      <guid>https://zihu97.github.io/posts/code/vuepresshope.html</guid>
+      <link>https://zihu97.github.io/posts/vuepresshope.html</link>
+      <guid>https://zihu97.github.io/posts/vuepresshope.html</guid>
       <source url="https://zihu97.github.io/rss.xml">VuePress博客教程</source>
       <description>VuePress博客教程 VuePress是一个vue驱动的静态网站生成器，非常适合来写静态文档，当然也可以拿来编写个人博客，配合第三方开发的主题可以做出非常精美的静态网站。</description>
       <category>tech</category>
