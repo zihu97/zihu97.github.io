@@ -2,4 +2,4 @@
 User-agent:*
 Disallow:
 
-Sitemap: https://zihu.github.io/sitemap.xml
+Sitemap: https://zihu97.github.io/sitemap.xml

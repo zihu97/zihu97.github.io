@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="https://zihu.github.io/rss.xsl"?>
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="https://zihu97.github.io/rss.xsl"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <atom:link href="https://zihu.github.io/rss.xml" rel="self" type="application/rss+xml"/>
+    <atom:link href="https://zihu97.github.io/rss.xml" rel="self" type="application/rss+xml"/>
     <title>紫狐</title>
-    <link>https://zihu.github.io/</link>
+    <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Sat, 22 Jun 2024 15:13:06 GMT</pubDate>
-    <lastBuildDate>Sat, 22 Jun 2024 15:13:06 GMT</lastBuildDate>
+    <pubDate>Sat, 22 Jun 2024 15:17:45 GMT</pubDate>
+    <lastBuildDate>Sat, 22 Jun 2024 15:17:45 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>技术日志</category>
@@ -15,9 +15,9 @@
     <category>Linux</category>
     <item>
       <title>VuePress博客教程</title>
-      <link>https://zihu.github.io/posts/code/vuepresshope.html</link>
-      <guid>https://zihu.github.io/posts/code/vuepresshope.html</guid>
-      <source url="https://zihu.github.io/rss.xml">VuePress博客教程</source>
+      <link>https://zihu97.github.io/posts/code/vuepresshope.html</link>
+      <guid>https://zihu97.github.io/posts/code/vuepresshope.html</guid>
+      <source url="https://zihu97.github.io/rss.xml">VuePress博客教程</source>
       <description>VuePress博客教程 VuePress是一个vue驱动的静态网站生成器，非常适合来写静态文档，当然也可以拿来编写个人博客，配合第三方开发的主题可以做出非常精美的静态网站。</description>
       <category>技术日志</category>
       <pubDate>Tue, 12 Jul 2022 00:00:00 GMT</pubDate>
@@ -179,9 +179,9 @@
     </item>
     <item>
       <title>海边的一段代码</title>
-      <link>https://zihu.github.io/posts/life/2023_01_22.html</link>
-      <guid>https://zihu.github.io/posts/life/2023_01_22.html</guid>
-      <source url="https://zihu.github.io/rss.xml">海边的一段代码</source>
+      <link>https://zihu97.github.io/posts/life/2023_01_22.html</link>
+      <guid>https://zihu97.github.io/posts/life/2023_01_22.html</guid>
+      <source url="https://zihu97.github.io/rss.xml">海边的一段代码</source>
       <description>海边的一段代码 过年的时候在厦门的海滩上，别人都在写和谁谁相爱一辈子，而我写了一段代码。</description>
       <category>生活随笔</category>
       <pubDate>Sun, 22 Jan 2023 00:00:00 GMT</pubDate>
@@ -195,9 +195,9 @@
     </item>
     <item>
       <title>ubuntu自定义系统服务</title>
-      <link>https://zihu.github.io/posts/code/linux/linuxservice.html</link>
-      <guid>https://zihu.github.io/posts/code/linux/linuxservice.html</guid>
-      <source url="https://zihu.github.io/rss.xml">ubuntu自定义系统服务</source>
+      <link>https://zihu97.github.io/posts/code/linux/linuxservice.html</link>
+      <guid>https://zihu97.github.io/posts/code/linux/linuxservice.html</guid>
+      <source url="https://zihu97.github.io/rss.xml">ubuntu自定义系统服务</source>
       <description>ubuntu自定义系统服务</description>
       <category>Linux</category>
       <pubDate>Sat, 28 Jan 2023 00:00:00 GMT</pubDate>
