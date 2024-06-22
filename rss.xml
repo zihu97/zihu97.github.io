@@ -6,21 +6,19 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Sat, 22 Jun 2024 15:17:45 GMT</pubDate>
-    <lastBuildDate>Sat, 22 Jun 2024 15:17:45 GMT</lastBuildDate>
+    <pubDate>Sat, 22 Jun 2024 15:35:40 GMT</pubDate>
+    <lastBuildDate>Sat, 22 Jun 2024 15:35:40 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
-    <category>技术日志</category>
-    <category>生活随笔</category>
-    <category>Linux</category>
+    <category>tech</category>
     <item>
       <title>VuePress博客教程</title>
       <link>https://zihu97.github.io/posts/code/vuepresshope.html</link>
       <guid>https://zihu97.github.io/posts/code/vuepresshope.html</guid>
       <source url="https://zihu97.github.io/rss.xml">VuePress博客教程</source>
       <description>VuePress博客教程 VuePress是一个vue驱动的静态网站生成器，非常适合来写静态文档，当然也可以拿来编写个人博客，配合第三方开发的主题可以做出非常精美的静态网站。</description>
-      <category>技术日志</category>
-      <pubDate>Tue, 12 Jul 2022 00:00:00 GMT</pubDate>
+      <category>tech</category>
+      <pubDate>Sat, 22 Jun 2024 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[<h1> VuePress博客教程</h1>
 <figure><img src="https://vuepress.vuejs.org/hero.png" alt="" tabindex="0" loading="lazy"><figcaption></figcaption></figure>
 <p>VuePress是一个vue驱动的静态网站生成器，非常适合来写静态文档，当然也可以拿来编写个人博客，配合第三方开发的主题可以做出非常精美的静态网站。</p>
@@ -176,101 +174,6 @@
 </div>
 ]]></content:encoded>
       <enclosure url="https://vuepress.vuejs.org/hero.png" type="image/png"/>
-    </item>
-    <item>
-      <title>海边的一段代码</title>
-      <link>https://zihu97.github.io/posts/life/2023_01_22.html</link>
-      <guid>https://zihu97.github.io/posts/life/2023_01_22.html</guid>
-      <source url="https://zihu97.github.io/rss.xml">海边的一段代码</source>
-      <description>海边的一段代码 过年的时候在厦门的海滩上，别人都在写和谁谁相爱一辈子，而我写了一段代码。</description>
-      <category>生活随笔</category>
-      <pubDate>Sun, 22 Jan 2023 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[<h1> 海边的一段代码</h1>
-<figure><img src="https://public-1308755698.cos.ap-chongqing.myqcloud.com//img/202310111956319.png" alt="" tabindex="0" loading="lazy"><figcaption></figcaption></figure>
-<p>过年的时候在厦门的海滩上，别人都在写和谁谁相爱一辈子，而我写了一段代码。</p>
-<!-- more -->
-<hr>
-]]></content:encoded>
-      <enclosure url="https://public-1308755698.cos.ap-chongqing.myqcloud.com//img/202310111956319.png" type="image/png"/>
-    </item>
-    <item>
-      <title>ubuntu自定义系统服务</title>
-      <link>https://zihu97.github.io/posts/code/linux/linuxservice.html</link>
-      <guid>https://zihu97.github.io/posts/code/linux/linuxservice.html</guid>
-      <source url="https://zihu97.github.io/rss.xml">ubuntu自定义系统服务</source>
-      <description>ubuntu自定义系统服务</description>
-      <category>Linux</category>
-      <pubDate>Sat, 28 Jan 2023 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[<h1> ubuntu自定义系统服务</h1>
-<img src="https://public-1308755698.cos.ap-chongqing.myqcloud.com//img/202310111508436.png" style="zoom: 150%;">
-<!-- more -->
-<hr>
-<p>在开发项目时，对于一些后台应用，可以自定义成linux的service，这样能够更加方便的管理。</p>
-<p>首先在<code>/etc/systemd/system</code>下，创建一个<code>xxx.service</code>的文件，<code>xxx</code>是服务名。</p>
-<p>service文件有特殊的配置格式，下面是一个简单的例子</p>
-<div class="language-txt line-numbers-mode" data-ext="txt"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>其中<code>type</code>有以下几种取值</p>
-<ul>
-<li>
-<p>Type=simple：默认值，执行ExecStart指定的命令，启动主进程</p>
-</li>
-<li>
-<p>Type=forking：以 fork 方式从父进程创建子进程，创建后父进程会立即退出</p>
-</li>
-<li>
-<p>Type=oneshot：一次性进程，Systemd 会等当前服务退出，再继续往下执行</p>
-</li>
-<li>
-<p>Type=dbus：当前服务通过D-Bus启动</p>
-</li>
-<li>
-<p>Type=notify：当前服务启动完毕，会通知Systemd，再继续往下执行</p>
-</li>
-<li>
-<p>Type=idle：若有其他任务执行完毕，当前服务才会运行，即后台运行</p>
-</li>
-</ul>
-<p>Restart：定义了退出后，Systemd 的重启方式。可以设置的值如下：</p>
-<ul>
-<li>
-<p>no（默认值）：退出后不会重启；</p>
-</li>
-<li>
-<p>on-success：当进程正常退出时（退出状态码为0），才会重启；</p>
-</li>
-<li>
-<p>on-failure：当进程非正常退出时(退出状态码非0)，包括被信号终止和超时，才会重启；</p>
-</li>
-<li>
-<p>on-abnormal：当被信号终止和超时，才会重启；</p>
-</li>
-<li>
-<p>on-abort：当收到没有捕捉到的信号终止时，才会重启；</p>
-</li>
-<li>
-<p>on-watchdog：看门狗超时退出，才会重启；</p>
-</li>
-<li>
-<p>always：总是重启。</p>
-</li>
-</ul>
-<p>KillMode：定义 Systemd 如何停止服务，可以设置的值如下：</p>
-<ul>
-<li>
-<p>control-group（默认值）：当前控制组里面的所有子进程，都会被杀掉；</p>
-</li>
-<li>
-<p>process：只杀主进程；</p>
-</li>
-<li>
-<p>mixed：主进程将收到 SIGTERM 信号，子进程收到 SIGKILL 信号；</p>
-</li>
-<li>
-<p>none：没有进程会被杀掉。</p>
-</li>
-</ul>
-<p>创建完成后，执行命令重新加载服务文件</p>
-<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div></div></div><p>随后使用<code>service hello service </code> 即可开启</p>
-]]></content:encoded>
     </item>
   </channel>
 </rss>
