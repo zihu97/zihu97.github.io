@@ -4,16 +4,16 @@ export const zhNavbar = navbar([
     {
         text: "技术文章",
         icon: "build",
-        link: "/category/技术日志/",
+        link: "/category/tech/",
     },
     {
         text: "其它分类",
         icon: "guide",
         children: [
             {
-                text: "Linux",
-                icon: "linux",
-                link: "/category/Linux/"
+                text: "工具合集",
+                icon: "box",
+                link: "/category/tool/"
             },
         ]
     },

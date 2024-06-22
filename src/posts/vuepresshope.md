@@ -1,8 +1,8 @@
 ---
-date: 2022-07-12
+date: 2024-06-22
 article: true
 category:
-  - 技术日志
+  - tech
 tag:
   - vuepress
   - theme-hope

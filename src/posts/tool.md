@@ -1,6 +1,10 @@
 ---
-date: 2023-02-07
-article: false
+date: 2024-06-22
+article: true
+category:
+  - tool
+tag:
+  - tool
 ---
 
 # 工具箱
@@ -148,7 +152,7 @@ article: false
 - [Poki](https://poki.com/zh)，国外的在线小游戏网站，有两万多个游戏。完全H5，Css3技术实现，没有借助flash，有点东西
 - [Watt Toolkit](https://steampp.net/)，前身是steam++，多功能游戏工具箱
 - [yikm](https://www.yikm.net/)，童年游戏集合，有小霸王，FC，SFC，GBA等
-- [[Rubik’s Cube Explorer](https://tools.bqrdh.com/rubiks-cube/)，在线拼魔方
+- [Rubik’s Cube Explorer](https://tools.bqrdh.com/rubiks-cube/)，在线拼魔方
 - [Minesweeper](http://www.minesweeper.cn/)，在线扫雷
 - [Life Restart](https://liferestart.syaro.io/public/index.html)，人生重开模拟器
 - [x-type](https://phoboslab.org/xtype/)，h5实现的web版雷霆战机

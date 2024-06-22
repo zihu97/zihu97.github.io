@@ -6,13 +6,13 @@ export default hopeTheme({
     hostname: "https://zihu97.github.io",
 
     author: {
-        name: "Mr.Hope",
-        url: "https://mister-hope.com",
+        name: "紫狐",
+        url: "https://zihu97.github.io/",
     },
 
     iconAssets: "iconfont",
 
-    logo: "/logo.png",
+    logo: "/logo.jpg",
 
     docsDir: "docs",
     editLink: false,
