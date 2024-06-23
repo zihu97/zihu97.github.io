@@ -1,0 +1,1 @@
+import{_ as t,W as a,X as o,Z as e,$ as c}from"./framework-3a0c4e99.js";const r={},s=e("h1",{id:"工具箱",tabindex:"-1"},[e("a",{class:"header-anchor",href:"#工具箱","aria-hidden":"true"},"#"),c(" 工具箱")],-1),n=[s];function _(d,i){return a(),o("div",null,n)}const l=t(r,[["render",_],["__file","go.html.vue"]]);export{l as default};
