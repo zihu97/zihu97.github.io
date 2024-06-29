@@ -6,78 +6,12 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Sun, 23 Jun 2024 13:29:10 GMT</pubDate>
-    <lastBuildDate>Sun, 23 Jun 2024 13:29:10 GMT</lastBuildDate>
+    <pubDate>Sat, 29 Jun 2024 08:55:27 GMT</pubDate>
+    <lastBuildDate>Sat, 29 Jun 2024 08:55:27 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
-    <category>tech</category>
     <category>tool</category>
-    <item>
-      <title>工具箱</title>
-      <link>https://zihu97.github.io/posts/container/docker%20hook.html</link>
-      <guid>https://zihu97.github.io/posts/container/docker%20hook.html</guid>
-      <source url="https://zihu97.github.io/rss.xml">工具箱</source>
-      <description>工具箱</description>
-      <category>tech</category>
-      <pubDate>Wed, 19 Jun 2024 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[<h1> 工具箱</h1>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>工具箱</title>
-      <link>https://zihu97.github.io/posts/container/docker%20runtime.html</link>
-      <guid>https://zihu97.github.io/posts/container/docker%20runtime.html</guid>
-      <source url="https://zihu97.github.io/rss.xml">工具箱</source>
-      <description>工具箱</description>
-      <category>tech</category>
-      <pubDate>Thu, 20 Jun 2024 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[<h1> 工具箱</h1>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>工具箱</title>
-      <link>https://zihu97.github.io/posts/container/libcontainer.html</link>
-      <guid>https://zihu97.github.io/posts/container/libcontainer.html</guid>
-      <source url="https://zihu97.github.io/rss.xml">工具箱</source>
-      <description>工具箱</description>
-      <category>tech</category>
-      <pubDate>Tue, 18 Jun 2024 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[<h1> 工具箱</h1>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>工具箱</title>
-      <link>https://zihu97.github.io/posts/d2l/d2l.html</link>
-      <guid>https://zihu97.github.io/posts/d2l/d2l.html</guid>
-      <source url="https://zihu97.github.io/rss.xml">工具箱</source>
-      <description>工具箱</description>
-      <category>tech</category>
-      <pubDate>Sun, 23 Jun 2024 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[<h1> 工具箱</h1>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>工具箱</title>
-      <link>https://zihu97.github.io/posts/ebpf/ebpf.html</link>
-      <guid>https://zihu97.github.io/posts/ebpf/ebpf.html</guid>
-      <source url="https://zihu97.github.io/rss.xml">工具箱</source>
-      <description>工具箱</description>
-      <category>tech</category>
-      <pubDate>Sun, 16 Jun 2024 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[<h1> 工具箱</h1>
-]]></content:encoded>
-    </item>
-    <item>
-      <title>工具箱</title>
-      <link>https://zihu97.github.io/posts/lang/go/go.html</link>
-      <guid>https://zihu97.github.io/posts/lang/go/go.html</guid>
-      <source url="https://zihu97.github.io/rss.xml">工具箱</source>
-      <description>工具箱</description>
-      <category>tech</category>
-      <pubDate>Fri, 14 Jun 2024 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[<h1> 工具箱</h1>
-]]></content:encoded>
-    </item>
+    <category>tech</category>
     <item>
       <title>工具箱</title>
       <link>https://zihu97.github.io/posts/tool.html</link>
