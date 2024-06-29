@@ -1,6 +1,6 @@
 ---
 date: 2024-06-14
-article: true
+article: false
 category:
   - tech
 tag:
