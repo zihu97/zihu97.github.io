@@ -13,4 +13,8 @@ projects:
     name: Giscus
     desc: 由 GitHub Discussions 驱动的评论系统
     link: https://giscus.app/zh-CN
+  - icon: /codeforces.jpg
+    name: Ratings
+    desc: 算法比赛排名
+    link: https://clist.by/coder/huayou/
 ---
