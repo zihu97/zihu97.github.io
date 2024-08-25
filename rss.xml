@@ -6,12 +6,89 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Sat, 29 Jun 2024 15:15:09 GMT</pubDate>
-    <lastBuildDate>Sat, 29 Jun 2024 15:15:09 GMT</lastBuildDate>
+    <pubDate>Sun, 25 Aug 2024 15:17:11 GMT</pubDate>
+    <lastBuildDate>Sun, 25 Aug 2024 15:17:11 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
-    <category>tool</category>
     <category>tech</category>
+    <category>tool</category>
+    <item>
+      <title>build with harbor</title>
+      <link>https://zihu97.github.io/posts/container/harbor.html</link>
+      <guid>https://zihu97.github.io/posts/container/harbor.html</guid>
+      <source url="https://zihu97.github.io/rss.xml">build with harbor</source>
+      <description>build&amp;nbsp;with&amp;nbsp;harbor 1&amp;nbsp;Private&amp;nbsp;Docker&amp;nbsp;Registry&amp;nbsp;Selection https://supereagle.github.io/2019/11/23/harbor-vs-quay/ 2&amp;nbsp;Harbor&amp;nbsp;Installation&amp;nbsp;and&amp;nbsp;Configuration</description>
+      <category>tech</category>
+      <pubDate>Fri, 16 Aug 2024 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[<h1> build&nbsp;with&nbsp;harbor</h1>
+<h1> 1&nbsp;Private&nbsp;Docker&nbsp;Registry&nbsp;Selection</h1>
+<p><a href="https://supereagle.github.io/2019/11/23/harbor-vs-quay/" target="_blank" rel="noopener noreferrer">https://supereagle.github.io/2019/11/23/harbor-vs-quay/</a></p>
+<h1> 2&nbsp;<a href="https://goharbor.io/docs/2.11.0/install-config/" target="_blank" rel="noopener noreferrer">Harbor&nbsp;Installation&nbsp;and&nbsp;Configuration</a></h1>
+<p>本章全程参考官网给出的手册</p>
+<h2> 2.1&nbsp;<a href="https://goharbor.io/docs/2.11.0/install-config/installation-prereqs/" target="_blank" rel="noopener noreferrer">Prerequisites</a></h2>
+<table>
+<thead>
+<tr>
+<th><strong>Software</strong></th>
+<th><strong>Version</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Docker&nbsp;Engine</td>
+<td>Version&nbsp;20.10.10-ce+&nbsp;or&nbsp;higher</td>
+<td>For&nbsp;installation&nbsp;instructions,&nbsp;see&nbsp;<a href="https://docs.docker.com/engine/installation/" target="_blank" rel="noopener noreferrer">Docker&nbsp;Engine&nbsp;documentation</a></td>
+</tr>
+<tr>
+<td>Docker&nbsp;Compose</td>
+<td>docker-compose&nbsp;(v1.18.0+)&nbsp;or&nbsp;docker&nbsp;compose&nbsp;v2&nbsp;(docker-compose-plugin)</td>
+<td>For&nbsp;installation&nbsp;instructions,&nbsp;see&nbsp;<a href="https://docs.docker.com/compose/install/" target="_blank" rel="noopener noreferrer">Docker&nbsp;Compose&nbsp;documentation</a></td>
+</tr>
+<tr>
+<td>OpenSSL</td>
+<td>Latest&nbsp;is&nbsp;preferred</td>
+<td>Used&nbsp;to&nbsp;generate&nbsp;certificate&nbsp;and&nbsp;keys&nbsp;for&nbsp;Harbor</td>
+</tr>
+</tbody>
+</table>
+<p>docker&nbsp;engine和docker&nbsp;compose可以通过docker&nbsp;desktop安装，以下适用于ubuntu&nbsp;22.04</p>
+<h3> 2.1.1&nbsp;<a href="https://docs.docker.com/desktop/install/ubuntu/" target="_blank" rel="noopener noreferrer"><strong>install&nbsp;docker&nbsp;desktop&nbsp;on&nbsp;ubuntu</strong></a></h3>
+<h4> 2.1.1.1&nbsp;<a href="https://docs.docker.com/engine/install/ubuntu/" target="_blank" rel="noopener noreferrer"><strong>install&nbsp;using&nbsp;the&nbsp;apt&nbsp;repository</strong></a></h4>
+<p>官网提供的源对国内用户不友好，以下使用<a href="https://zhuanlan.zhihu.com/p/588264423" target="_blank" rel="noopener noreferrer">阿里的docker镜像仓库证书</a></p>
+<h5> 2.1.1.1.1&nbsp;安装设置仓库必须的工具</h5>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div></div></div><h5> 2.1.1.1.2&nbsp;添加阿里的&nbsp;Docker&nbsp;镜像仓库证书</h5>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div></div></div><h5> 2.1.1.1.3&nbsp;添加仓库</h5>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h4> 2.1.1.2&nbsp;Download&nbsp;latest&nbsp;<a href="https://desktop.docker.com/linux/main/amd64/docker-desktop-amd64.deb?utm_source=docker&amp;utm_medium=webreferral&amp;utm_campaign=docs-driven-download-linux-amd64&amp;_gl=1*1bzne95*_ga*Mzk5NTI4MjQ1LjE3MjE3MDU4MTE.*_ga_XJWPQMJYHQ*MTcyMzYxNjg4Ni4zLjEuMTcyMzYxNzk4MC42MC4wLjA." target="_blank" rel="noopener noreferrer">DEB&nbsp;package</a></h4>
+<h4> 2.1.1.3&nbsp;Install&nbsp;the&nbsp;package&nbsp;with&nbsp;apt&nbsp;as&nbsp;follows</h4>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div></div></div><h3> 2.1.2&nbsp;launch&nbsp;docker&nbsp;desktop</h3>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3> 2.1.3&nbsp;check&nbsp;the&nbsp;versions</h3>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> 2.2&nbsp;<a href="https://goharbor.io/docs/2.11.0/install-config/download-installer/" target="_blank" rel="noopener noreferrer">Download&nbsp;the&nbsp;Harbor&nbsp;Installer</a></h2>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> 2.3&nbsp;<a href="https://goharbor.io/docs/2.11.0/install-config/configure-yml-file/" target="_blank" rel="noopener noreferrer">Configure&nbsp;the&nbsp;Harbor&nbsp;YML&nbsp;File</a></h2>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> 2.4&nbsp;<a href="https://goharbor.io/docs/2.11.0/install-config/run-installer-script/" target="_blank" rel="noopener noreferrer">Run&nbsp;the&nbsp;Installer&nbsp;Script</a></h2>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div></div></div><h3> 2.4.1&nbsp;Connecting&nbsp;to&nbsp;Harbor&nbsp;via&nbsp;HTTP</h3>
+<h4> 2.4.1.1&nbsp;Restart&nbsp;Docker&nbsp;Engine</h4>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div></div></div><h4> 2.4.1.2&nbsp;Stop&nbsp;Harbor</h4>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div></div></div><h4> 2.4.1.1&nbsp;Restart&nbsp;Harbor</h4>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div></div></div><h1> 3&nbsp;Startup&nbsp;service</h1>
+<h2> 3.1&nbsp;configure&nbsp;service</h2>
+<p>vi&nbsp;/etc/systemd/system/harbor.service</p>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> 3.2&nbsp;start&nbsp;service</h2>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> 3.3&nbsp;query&nbsp;service</h2>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div></div></div><h1> 4 private&nbsp;docker&nbsp;registry</h1>
+<h1> 4.1 registry&nbsp;URL</h1>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h1> 4.2 configure&nbsp;docker</h1>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h1> 4.3 push&nbsp;images</h1>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><figure><img src="https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/8K4nyRpYGvLeqLbj/img/a28f0074-9734-4fdf-a85e-096d771bae73.png" alt="image" tabindex="0" loading="lazy"><figcaption>image</figcaption></figure>
+<h1> 4.4 pull&nbsp;images</h1>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div></div></div><h1> 5&nbsp;过程踩到的坑</h1>
+<h2> 5.1&nbsp;docker&nbsp;daemon没有拉起来？</h2>
+<p>Cannot&nbsp;connect&nbsp;to&nbsp;the&nbsp;Docker&nbsp;daemon&nbsp;at&nbsp;unix:///var/run/docker.sock.&nbsp;Is&nbsp;the&nbsp;docker&nbsp;daemon&nbsp;running?</p>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div></div></div><p><strong>出问题了请先查docker&nbsp;logs</strong></p>
+<p>这次遇到的问题是和iptables相关，解决办法是</p>
+<div class="language-bash line-numbers-mode" data-ext="sh"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div></div></div>]]></content:encoded>
+      <enclosure url="https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/8K4nyRpYGvLeqLbj/img/a28f0074-9734-4fdf-a85e-096d771bae73.png" type="image/png"/>
+    </item>
     <item>
       <title>工具箱</title>
       <link>https://zihu97.github.io/posts/tool.html</link>
