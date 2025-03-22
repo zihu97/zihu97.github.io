@@ -6,26 +6,27 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Sat, 22 Mar 2025 03:26:54 GMT</pubDate>
-    <lastBuildDate>Sat, 22 Mar 2025 03:26:54 GMT</lastBuildDate>
+    <pubDate>Sat, 22 Mar 2025 06:38:55 GMT</pubDate>
+    <lastBuildDate>Sat, 22 Mar 2025 06:38:55 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
     <category>tool</category>
     <item>
-      <title>Q1:2019年，阿里巴巴宣布要全面上云，而且“上云就要上云原生”，为什么要全面上云？</title>
+      <title>CNCF Alibaba 云原生技术公开课总结</title>
       <link>https://zihu97.github.io/posts/container/cloud-native.html</link>
       <guid>https://zihu97.github.io/posts/container/cloud-native.html</guid>
-      <source url="https://zihu97.github.io/rss.xml">Q1:2019年，阿里巴巴宣布要全面上云，而且“上云就要上云原生”，为什么要全面上云？</source>
-      <description>课程CNCF Alibaba 云原生技术公开课 Q1:2019年，阿里巴巴宣布要全面上云，而且“上云就要上云原生”，为什么要全面上云？ 以往发布或者更新软件，需要SSH连到服务器，然后手动升级或降级软件包，调整配置文件；上云后，更新只要更改公共镜像来构建新服务直接替换旧服务，且可以更好地扩容</description>
+      <source url="https://zihu97.github.io/rss.xml">CNCF Alibaba 云原生技术公开课总结</source>
+      <description>CNCF Alibaba 云原生技术公开课总结 课程CNCF Alibaba 云原生技术公开课 Q1:2019年，阿里巴巴宣布要全面上云，而且“上云就要上云原生”，为什么要全面上云？ 以往发布或者更新软件，需要SSH连到服务器，然后手动升级或降级软件包，调整配置文件；上云后，更新只要更改公共镜像来构建新服务直接替换旧服务，且可以更好地扩容</description>
       <category>tech</category>
       <pubDate>Sun, 08 Dec 2024 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[<p>课程<a href="https://developer.aliyun.com/learning/roadmap/cloudnative" target="_blank" rel="noopener noreferrer">CNCF Alibaba 云原生技术公开课</a></p>
-<h1> Q1:2019年，阿里巴巴宣布要全面上云，而且“上云就要上云原生”，为什么要全面上云？<a id="Q1"></a></h1>
+      <content:encoded><![CDATA[<h1> CNCF Alibaba 云原生技术公开课总结</h1>
+<p>课程<a href="https://developer.aliyun.com/learning/roadmap/cloudnative" target="_blank" rel="noopener noreferrer">CNCF Alibaba 云原生技术公开课</a></p>
+<h2> Q1:2019年，阿里巴巴宣布要全面上云，而且“上云就要上云原生”，为什么要全面上云？<a id="Q1"></a></h2>
 <p>以往发布或者更新软件，需要SSH连到服务器，然后手动升级或降级软件包，调整配置文件；上云后，更新只要更改公共镜像来构建新服务直接替换旧服务，且可以更好地扩容</p>
-<h1> Q2:云原生到底是什么？<a id="Q2"></a></h1>
+<h2> Q2:云原生到底是什么？<a id="Q2"></a></h2>
 <p>云原生为用户指定了一条低心智负担的、敏捷的、能够以可扩展、可复制的方式最大化地利用云的能力、发挥云的价值的最佳路径。</p>
-<h1> Q3:云原生包含了什么？<a id="Q3"></a></h1>
+<h2> Q3:云原生包含了什么？<a id="Q3"></a></h2>
 <p>1）云应用定义与开发流程</p>
 <p>应用定义与<a href="#Q5">镜像</a>制作、配置 CI/CD、消息和 Streaming 以及数据库等。</p>
 <p>2）云应用的编排与管理流程</p>
@@ -38,7 +39,7 @@
 <p>配套的生态或者周边的工具，比如流程自动化与配置管理、容器镜像仓库、云原生安全技术以及云端密码管理等。</p>
 <p>6）Serverless</p>
 <p>Serverless 是一种 PaaS 的特殊形态，它定义了一种更为“极端抽象”的应用编写方式，包含了 FaaS 和 BaaS 这样的概念。而无论是 FaaS 还是 BaaS，其最为典型的特点就是按实际使用计费（Pay as you go）。</p>
-<h1> Q4:云原生应用的基础———容器？<a id="Q4"></a></h1>
+<h2> Q4:云原生应用的基础———容器？<a id="Q4"></a></h2>
 <p>容器就是一个视图隔离、资源可限制、独立文件系统的进程集合。</p>
 <p>1）独立文件系统</p>
 <p>通过 chroot 系统调用将子目录变成根目录，使得进程具有独立的文件系统</p>
@@ -46,9 +47,9 @@
 <p>通过Namespace 技术实现进程资源隔离</p>
 <p>3）资源可限制</p>
 <p>通过 Cgroup来设置其能够使用的 CPU 以及内存量</p>
-<h1> Q5:容器镜像是什么？<a id="Q5"></a></h1>
+<h2> Q5:容器镜像是什么？<a id="Q5"></a></h2>
 <p>容器运行时所需要的所有的文件集合称之为容器镜像。</p>
-<h1> Q6:changeset是什么？有什么优势？<a id="Q6"></a></h1>
+<h2> Q6:changeset是什么？有什么优势？<a id="Q6"></a></h2>
 <p>采用 Dockerfile 来构建镜像，可以很好地描述构建的每个步骤。每个构建步骤都会对已有的文件系统进行操作，这样就会带来文件系统内容的变化，我们将这些变化称之为 changeset。当我们把构建步骤所产生的变化依次作用到一个空文件夹上，就能够得到一个完整的镜像。</p>
 <p>优势：</p>
 <p>1）提高分发效率
@@ -57,9 +58,9 @@
 golang镜像基于alpine镜像构建，当本地已经具有了 alpine 镜像之后，在下载 golang 镜像的时候只需要下载本地 alpine 镜像中没有的部分即可</p>
 <p>3）节约磁盘空间
 本地存储alpine镜像和golang镜像时，磁盘只要占用golang镜像的空间即可</p>
-<h1> Q7:容器的生命周期是多久？<a id="Q7"></a></h1>
+<h2> Q7:容器的生命周期是多久？<a id="Q7"></a></h2>
 <p>使用 docker run 的时候会选择一个镜像来提供独立的文件系统并指定相应的运行程序。这里指定的运行程序称之为 initial 进程。容器的生命周期和 initial 进程的生命周期是一致的。initial 进程本身也可以产生其他的子进程或者通过 docker exec 产生出来的运维操作，也属于 initial 进程管理的范围内。</p>
-<h1> Q8:Kubernetes有哪些功能？<a id="Q8"></a></h1>
+<h2> Q8:Kubernetes有哪些功能？<a id="Q8"></a></h2>
 <p>1）服务的发现与负载的均衡</p>
 <p>2）容器的调度
 <img src="/images/cloud-native/image.png" alt="alt text" loading="lazy"></p>
@@ -71,7 +72,7 @@ golang镜像基于alpine镜像构建，当本地已经具有了 alpine 镜像之
 <p>6）支持水平的伸缩
 <img src="/images/cloud-native/image-3.png" alt="alt text" loading="lazy">
 <img src="/images/cloud-native/image-4.png" alt="alt text" loading="lazy"></p>
-<h1> Q9:K8s的架构？<a id="Q9"></a></h1>
+<h2> Q9:K8s的架构？<a id="Q9"></a></h2>
 <p>Kubernetes 架构是一个比较典型的二层架构和 server-client 架构。Master 作为中央的管控节点，会去与 Node 进行一个连接。
 <img src="/images/cloud-native/image-5.png" alt="alt text" loading="lazy"></p>
 <p>1）API Server</p>
@@ -91,7 +92,7 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <p>用户自己或者云厂商都会去写相应的 Storage Plugin 或者 Network Plugin，去完成存储操作或网络操作。</p>
 <p>5-3）Kube-proxy</p>
 <p>利用了 iptable 的能力来进行组建 Kubernetes 的 Network，就是 cluster network。</p>
-<h1> Q10:K8s的核心概念？<a id="Q10"></a></h1>
+<h2> Q10:K8s的核心概念？<a id="Q10"></a></h2>
 <p>1）Pod <a id="Pod"></a></p>
 <p>Pod 是 Kubernetes 的一个最小调度以及资源单元，包含一个或多个容器。</p>
 <p>2）Volume</p>
@@ -108,7 +109,7 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 </ul>
 <p>5）Namespace</p>
 <p>Namespace 是用来做一个集群内部的逻辑隔离的，它包括鉴权、资源管理等。</p>
-<h1> Q11:K8s的API？<a id="Q10"></a></h1>
+<h2> Q11:K8s的API？<a id="Q10"></a></h2>
 ]]></content:encoded>
       <enclosure url="https://zihu97.github.io/images/cloud-native/image.png" type="image/png"/>
     </item>
