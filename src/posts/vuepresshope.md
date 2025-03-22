@@ -263,7 +263,7 @@ import {zhSidebar} from "./sidebar";
 export default hopeTheme({
     plugins: {
         readingTime: {
-            wordPerMinute: 150 // 即每分钟阅读150个字
+            wordPerMinute: 300 // 即每分钟阅读300个字
         },  
     }
 });

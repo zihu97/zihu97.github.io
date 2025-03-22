@@ -56,7 +56,7 @@ export default hopeTheme({
             lazyLoading: true,
         },
         readingTime: {
-            wordPerMinute: 150
+            wordPerMinute: 300
         },
         feed: {
             rss: true,
