@@ -8,11 +8,11 @@ tag:
 ---
 
 # io_uring源码解析（逐Patch）
-’‘’
+```
 git log --grep="io_uring" --pretty=format:"%h - %s" --reverse --no-merges | \
 awk '{lines[NR] = $0} END {for (i = NR; i > 0; i--) printf("## [%d] %s\n", i, lines[i]);}' | \
 tee io_uring.commit.list
-‘’‘
+```
 
 ## [3508] d55011469b41 - fuse: fix possible deadlock if rings are never initialized
 ## [3507] 182db972c956 - mm: fix error handling in __filemap_get_folio() with FGP_NOWAIT
