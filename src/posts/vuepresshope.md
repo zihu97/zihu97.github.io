@@ -429,8 +429,25 @@ jobs:
 
 推送完代码后Github会自动执行Actions，然后将网站打包的内容推送到`gh-pages`分支，然后Github会自动更新静态网站的内容。
 
-::: tip
+::: warning 部署问题排查
 
-需要注意的是要开启Github Action允许修改仓库的权限。
+如果在部署过程中遇到以下错误：
+
+```bash
+/usr/bin/git push --force ***github.com/zihu97/zihu97.github.io.git github-pages-deploy-action/eo622voxe:gh-pages
+remote: Invalid username or password.
+fatal: Authentication failed for 'https://github.com/zihu97/zihu97.github.io.git/'
+```
+
+这表明你的 GitHub Token 已经过期或无效。请按照以下步骤解决：
+
+1. 访问 GitHub 的 [Developer Settings](https://github.com/settings/tokens)
+2. 生成新的 Personal Access Token (Classic)
+3. 复制新生成的 token
+4. 进入你的仓库设置 [Secrets and variables/Actions](https://github.com/zihu97/zihu97.github.io/settings/secrets/actions)
+5. 找到名为 `TITLE` 的 secret
+6. 点击 "Update" 并粘贴新的 token
+
+完成这些步骤后，重新运行 GitHub Actions 工作流即可解决认证问题。
 
 :::
