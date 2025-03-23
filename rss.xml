@@ -6,12 +6,32 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Sat, 22 Mar 2025 06:38:55 GMT</pubDate>
-    <lastBuildDate>Sat, 22 Mar 2025 06:38:55 GMT</lastBuildDate>
+    <pubDate>Sun, 23 Mar 2025 04:42:46 GMT</pubDate>
+    <lastBuildDate>Sun, 23 Mar 2025 04:42:46 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
     <category>tool</category>
+    <item>
+      <title>lkml订阅步骤</title>
+      <link>https://zihu97.github.io/posts/linux/lkml.html</link>
+      <guid>https://zihu97.github.io/posts/linux/lkml.html</guid>
+      <source url="https://zihu97.github.io/rss.xml">lkml订阅步骤</source>
+      <description>lkml订阅步骤 官方说明 https://subspace.kernel.org/subscribing.html Step 1 see https://subspace.kernel.org/vger.kernel.org.html</description>
+      <category>tech</category>
+      <pubDate>Sat, 22 Mar 2025 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[<h1> lkml订阅步骤</h1>
+<h2> 官方说明</h2>
+<p><a href="https://subspace.kernel.org/subscribing.html" target="_blank" rel="noopener noreferrer">https://subspace.kernel.org/subscribing.html</a></p>
+<h2> Step 1</h2>
+<p>see <a href="https://subspace.kernel.org/vger.kernel.org.html" target="_blank" rel="noopener noreferrer">https://subspace.kernel.org/vger.kernel.org.html</a></p>
+<p>看哪个邮件列表你最想关注</p>
+<h2> Step 2</h2>
+<p>点击对应的sub发送邮件再确认即可（主题和正文都不用填）
+<img src="/images/lkml/sub.png" alt="alt text" loading="lazy"></p>
+]]></content:encoded>
+      <enclosure url="https://zihu97.github.io/images/lkml/sub.png" type="image/png"/>
+    </item>
     <item>
       <title>CNCF Alibaba 云原生技术公开课总结</title>
       <link>https://zihu97.github.io/posts/container/cloud-native.html</link>
