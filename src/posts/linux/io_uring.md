@@ -3456,59 +3456,330 @@ tee io_uring.commit.list
 ## [69] f95d050cdc5d - perf arm64: Fix mksyscalltbl when system kernel headers are ahead of the kernel
 ## [68] a278682dad37 - io_uring: Fix __io_uring_register() false success
 ## [67] 004d564f9087 - tools/io_uring: sync with liburing
+
+
+
+
+
 ## [66] 486f069253c3 - tools/io_uring: fix Makefile for pthread library link
 ## [65] 1cdc415f1083 - uapi, fsopen: use square brackets around "fscontext" [ver #2]
+
+详见commit message
+
+
+
 ## [64] fdb288a679cd - io_uring: use wait_event_interruptible for cq_wait conditional wait
+
+使用wait_event_interruptible替代原来的prepare_to_wait+schedule+finish_wait
+
+
+
 ## [63] dc6ce4bc2b35 - io_uring: adjust smp_rmb inside io_cqring_events
+
+代码没有发生任何变化，就是调整了代码位置
+
+
+
 ## [62] 2bbcd6d3b36a - io_uring: fix infinite wait in khread_park() on io_finish_async()
+
+详见commit message
+
+一般挂起流程是kthread_park - kthread_should_park - kthread_parkme（这时候才算真正挂起了），kthread_park会wait kthread_parkme的completition
+
+prepare_to_wait准备休眠，schedule主动休眠，finish_wait结束休眠
+
+io_sq_thread - kthread_should_park  - kthread_parkme
+             - !kthread_should_park - io_get_sqring  - io_submit_sqes
+                                    - !io_get_sqring - prepare_to_wait - io_get_sqring - finish_wait(说明IO有了不能休眠了) - io_submit_sqes
+                                                                       - !io_get_sqring - kthread_should_park - kthread_parkme
+                                                                                        - !kthread_should_park - schedule（休眠）- finish_wait（说明被wakeup,进入下一循环）
 ## [61] c71ffb673cd9 - io_uring: remove 'ev_flags' argument
 ## [60] 44a9bd18a0f0 - io_uring: fix failure to verify SQ_AFF cpu
+
+详见commit message
+
+
+
 ## [59] e2033e33cb38 - io_uring: fix race condition reading SQE data
+
+说是有竞态，但没看出来，应该大意是原来的REQ_F_PREPPED可以使得-EAGAIN进入workqueue调度时不需要重新准备req但这样会导致req一些字段沿用了之前的内容导致了异常行为，所以去掉了REQ_F_PREPPED，每一次都重新准备req，虽然会带来些性能损失
+
+
+
 ## [58] 214828962dea - io_uring: initialize percpu refcounters using PERCU_REF_ALLOW_REINIT
+
+详见commit message, 不过PERCPU_REF_ALLOW_REINIT看linux代码这个flag好像没什么作用
+
+
+
 ## [57] 7889f44dd9ce - io_uring: use cpu_online() to check p->sq_thread_cpu instead of cpu_possible()
+
+cpu_possible没有考虑到下线的cpu情况，用cpu_online判断是否在线可调度更合理
+
+
+
 ## [56] efeb862bd5bc - io_uring: fix shadowed variable ret return code being not checked
+
+详见commit message
+
+
+
 ## [55] e87eb301bee1 - blk-mq: grab .q_usage_counter when queuing request from plug code path
+
+rt
+
+
+
 ## [54] 9b402849e80c - io_uring: add support for eventfd notifications
+
+支持eventfd注册减少频繁的引用申请和释放，与之前的io_uring_register注册的buff，file等类似
+
+
+
 ## [53] 5d17b4a4b7fa - io_uring: add support for IORING_OP_SYNC_FILE_RANGE
+
+支持io_uring模式下的sync_file_range
+
+
+
 ## [52] de0617e46717 - io_uring: add support for marking commands as draining
+
+支持IOSQE_IO_DRAIN可以保证只有在前面的IO做完之后才提交当前的IO,判断方式为在提交时设置seq，判断方式为seq是否比cq_tail+dropped更大，seq记录为前一个IO的head（cached_sq_head - 1，因为当前sq已经使得cached_sq_head++，那么-1就代表是当前的IO的head，从0开始），cq_tail+dropped即已做完的IO的head除去无效的IO,如果seq>cq_tail+dropped那就说明前一个已经做完了
+
+如果需要drain那么设置req flag为REQ_F_IO_DRAIN，完成后设置为REQ_F_IO_DRAINED，比起完成后设置为～REQ_F_IO_DRAIN这样如果drained的req做完再判断的时候就不需要特殊处理了
+
+io_submit_sqe - !io_sequence_defer(ctx, req) && list_empty(&ctx->defer_list)(即当前没有drain且没有已被drain阻塞的任务，就可以直接做) - __io_submit_sqe
+              - 相反地 - 放到defer_list
+                                      - io_commit_cqring(每个cq产生都判断defer_list队首的IO是否可以开始，如果可以则进wq) - io_sq_wq_submit_work
+
 ## [51] d4ef647510b1 - io_uring: avoid page allocation warnings
+
+用kvmalloc_array替代kmalloc_array来同时适应大内存和小内存的分配
+
+
+
 ## [50] 817869d2519f - io_uring: drop req submit reference always in async punt
+
+解决__io_submit_sqe失败下没有没有释放提交引用导致的内存泄漏，换个思路就是只要req提交成功就应该释放，然后提交失败的req马上释放本身的引用，提交成功的req在后处理释放本身的引用
+
+
+
 ## [49] 52e04ef4c9d4 - io_uring: free allocated io_memory once
+
+ctx->sq_*字段内存分配失败的时候会多次free，修复了这个问题
+
+
+
 ## [48] 975554b03edd - io_uring: fix SQPOLL cpu validation
+
+NR_CPUS表示内核​理论上支持的最大CPU数量,由内核配置选项 CONFIG_NR_CPUS 定义, nr_cpu_ids表示​当前系统中可能存在的最大 CPU 逻辑编号
+
+用nr_cpu_ids代替NR_CPUS()，最后用返回值来判断，确实比反复判断原来值更合理
+
+
+
 ## [47] 5c8b0b54db22 - io_uring: have submission side sqe errors post a cqe
+
+详见commit message
+
+
+
 ## [46] 62977281a638 - io_uring: remove unnecessary barrier after unsetting IORING_SQ_NEED_WAKEUP
+
+对于IORING_SQ_NEED_WAKEUP这个flag，不管什么情况都可能会有冲突，所以这里的内存屏障没什么意义
+
+
+
 ## [45] b841f19524a1 - io_uring: remove unnecessary barrier after incrementing dropped counter
 ## [44] 82ab082c0e2f - io_uring: remove unnecessary barrier before reading SQ tail
 ## [43] 9e4c15a39394 - io_uring: remove unnecessary barrier after updating SQ head
+
+已经通过smp_store_release和smp_load_acquire保证了，没必要做两次内存屏障
+
+
+
 ## [42] 115e12e58dbc - io_uring: remove unnecessary barrier before reading cq head
+
+我理解是ring->r.head是增长的，而tail由kernel控制，那么如果head先读，那么head其实<= read head，对于cq满了的判断其实更有好处，因为如果真满了，那么此时也必然是不成立，所以这里的内存屏障其实没必要
+
+
+
 ## [41] 4f7067c3fb7f - io_uring: remove unnecessary barrier before wq_has_sleeper
+
+看linux/include/linux/wait.h中wq_has_sleeper的源码包含了smp_mb()，所以不需要在wq_has_sleeper前再做同步了
+
+
+
 ## [40] 1e84b97b7377 - io_uring: fix notes on barriers
+
+修改注解，尤其关于内存屏障相关的内容
+
+
+
 ## [39] 8449eedaa1da - io_uring: fix handling SQEs requesting NOWAIT
+
+原来操作：不是cached不能立马做完的都会放到workqueue，那么现在如果用户read/write的时候要求NOWAIT,那么不会放入wq，就会直接报错
+
+
+
 ## [38] 8358e3a8264a - io_uring: remove 'state' argument from io_{read,write} path
+
+rt
+
+
+
 ## [37] fb775faa9e46 - io_uring: fix poll full SQ detection
+
+和[33] 74f464e97044的修改一样，原来的修改如果是u32这种溢出回转的应该没问题，但ring_entries是按照用户给定的设置的，因此不能这样使用
+
+
+
 ## [36] 0d7bae69c574 - io_uring: fix race condition when sq threads goes sleeping
+
+严格保证先写IORING_SQ_NEED_WAKEUP再去看tail是否还有sqe可以执行，避免先发现sqe可以执行，将IORING_SQ_NEED_WAKEUP回退然后再写IORING_SQ_NEED_WAKEUP导致sq thread陷入睡眠的情况
+
+
+
 ## [35] e523a29c4f27 - io_uring: fix race condition reading SQ entries
+
+x86：强内存模型（TSO），保证Store-Store顺序；ARM：弱内存模型（Weak Ordering），允许Store-Store重排，"memory" 只约束编译器重排，dmb ishst 同时约束编译器和CPU内存访问顺序
+
+smp_load_acquire看了下linux/include/asm-generic/barrier.h里面的实现，是先读再mb()，而smp_store_release是先mb()再写
+
+与queue.c中的io_uring_submit的*sq->ktail = ktail;的前写屏障对应，user要保证先写array再写tail，那么kernel要保证先读tail再读array，如果是read_once，可能出现先读sq entry再读tail的情况，下面这种情况：用户sq entry写到一半 -> kernel读sq entry(异常值) -> 用户sq entry写完 -> 用户写tail -> kernel读tail，那么kernel认为tail是合理的但是会读出异常的sq entry导致问题
+
+
+
 ## [34] 35fa71a030ca - io_uring: fail io_uring_register(2) on a dying io_uring instance
+
+如果同时进入io_uring_register，那么只需要保留一个做就可以了，其他的可以直接返回
+
+
+
 ## [33] 74f464e97044 - io_uring: fix CQ overflow condition
+
+看了cm(commit message)盲猜是tail远远超过head的情况，但是tail和head的差值应该是小于ring->ring_entries的，所以会导致sqe->off越界
+
+
+
 ## [32] b19062a56726 - io_uring: fix possible deadlock between io_uring_{enter,register}
+
+__io_uring_register的调用点持锁了，避免io_uring_enter和io_uring_register同时发生可能的死锁问题，先释放锁因为这时候是安全的不会重入
+
+
+
 ## [31] 39036cd27273 - arch: add pidfd and io_uring syscalls everywhere
+
+将io_uring从x86推广到其他所有架构
+
+
+
 ## [30] 3d6770fbd935 - io_uring: drop io_file_put() 'file' argument
+
+rt
+
+
+
 ## [29] 917257daa0fe - io_uring: only test SQPOLL cpu after we've verified it
+
+只在IORING_SETUP_SQPOLL下使用到sq_thread_idle，因此将sq_thread_idle设置放到IORING_SETUP_SQPOLL下
+
+判断cpu_possible避免在未使用的cpu上创建内核线程
+
+
+
 ## [28] 060586324648 - io_uring: park SQPOLL thread if it's percpu
+
+通过kthread_should_park和kthread_parkme确保内核线程能够在系统暂停情况下预期停车
+
+
+
 ## [27] 3ec482d15cb9 - io_uring: restrict IORING_SETUP_SQPOLL to root
+
+rt
+
+
+
 ## [26] 704236672eda - tools/io_uring: remove IOCQE_FLAG_CACHEHIT
+
+rt
+
+
+
 ## [25] 25adf50fe25d - io_uring: fix double free in case of fileset regitration failure
+
+rt(如题)
+
+
+
 ## [24] 8142bd82a59e - tools headers: Update x86's syscall_64.tbl and uapi/asm-generic/unistd
+
+perf trace -s io_uring-cp ~acme/isos/RHEL-x86_64-dvd1.iso ~/bla
+
+perf trace -e io_uring* -s io_uring-cp ~acme/isos/RHEL-x86_64-dvd1.iso ~/bla
+
+
+
 ## [23] 9bf7933fc3f3 - io_uring: offload write to async worker in case of -EAGAIN
+
+将[12] 31b515106428实现的io_read优化复刻到io_write
+
+
+
 ## [22] 9e75ad5d8f39 - io_uring: fix big-endian compat signal mask handling
+
+详见commit message
+
+
+
 ## [21] bf33a7699e99 - io_uring: mark me as the maintainer
+
+add maintainer
+
+
+
 ## [20] fd6fab2cb78d - io_uring: retry bulk slab allocs as single allocs
+
+增加kmem_cache_alloc_bulk分配失败就用kmem_cache_alloc重试分配一个的处理
+
+
+
 ## [19] 8c838788775a - io_uring: fix poll races
+
+详见commit message
+
+
+
 ## [18] 09bb839434bd - io_uring: fix fget/fput handling
+
+把文件管理放到更高层次，统一处理
+
+
+
 ## [17] d530a402a114 - io_uring: add prepped flag
+
+用req->flags & REQ_F_PREPPED代替kiocb->ki_filp来判断是否prepped
+
+
+
 ## [16] e0c5c576d507 - io_uring: make io_read/write return an integer
+
+详见commit message
+
+
+
 ## [15] e65ef56db494 - io_uring: use regular request ref counts
+
+使用ref_count来管理req的全生命周期，每个req初始化2个ref，如果req已提交，那么ref--，如果req异常退出或者正常结束，再ref--
+
+
+
 ## [14] b5420237ec81 - mm: refactor readahead defines in mm.h
+
+详见commit message
+
+
+
 ## [13] 21b4aa5d20fd - io_uring: add a few test tools
 
 封装了liburing和增加了两个用户态用例：
@@ -3552,6 +3823,15 @@ SQPOLL提交完就会返回系统调用,然后在reap_events中一直检查完�
 
 <u>list_del_init重新初始化链表避免内存泄漏等异常行为</u>
 
+IORING_OP_POLL_ADD  - io_poll_complete_work(one-shot poll情况下直接提交给原先相同的workqueue但是work不一样)
+!IORING_OP_POLL_ADD - io_sq_wq_submit_work
+
+io_poll_remove/io_poll_remove_all - io_poll_remove_one(canceled) - io_poll_complete_work - add_wait_queue
+
+                                    io_poll_wake                 - io_poll_complete_work - io_poll_complete
+
+io_poll_queue_proc - add_wait_queue
+
 
 
 ## [9] 6c271ce2f1d5 - io_uring: add submission polling
@@ -3561,6 +3841,16 @@ SQPOLL提交完就会返回系统调用,然后在reap_events中一直检查完�
 用kthread（io_sq_thread）来自动获取sq_ring，同时支持用IORING_SETUP_SQ_AFF来绑核
 
 <u>支持设置超时时间，超时后设置IORING_SQ_NEED_WAKEUP，进入wait状态，需要用户重新下发io_uring_enter系统调用带上IORING_ENTER_SQ_WAKEUP才会重新唤醒</u>
+
+```
+IORING_SETUP_SQPOLL  - io_sq_thread(内核线程)          - io_submit_sqes - io_submit_sqe
+                                                       - IORING_SETUP_IOPOLL  - io_iopoll_check
+                     - no wait cq
+
+!IORING_SETUP_SQPOLL - to_submit（submit sq）          - io_ring_submit - io_submit_sqe - （cached IO 直接提交/io_sq_wq_submit_work(non-cached IO 放到wq异步提交)）- __io_submit_sqe(cached IO 直接提交) - IORING_SETUP_IOPOLL(提交给ctx->poll_list)
+                     - IORING_ENTER_GETEVENTS(wait cq) - IORING_SETUP_IOPOLL  - io_iopoll_check(轮询)      - io_complete_rw_iopoll
+                                                       - !IORING_SETUP_IOPOLL - prepare_to_wait(等待中断)  - io_complete_rw
+```
 
 
 
