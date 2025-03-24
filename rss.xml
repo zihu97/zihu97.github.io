@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Sun, 23 Mar 2025 04:42:46 GMT</pubDate>
-    <lastBuildDate>Sun, 23 Mar 2025 04:42:46 GMT</lastBuildDate>
+    <pubDate>Mon, 24 Mar 2025 09:11:02 GMT</pubDate>
+    <lastBuildDate>Mon, 24 Mar 2025 09:11:02 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3623,20 +3623,36 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [30] 3d6770fbd935 - io_uring: drop io_file_put() 'file' argument</h2>
 <h2> [29] 917257daa0fe - io_uring: only test SQPOLL cpu after we've verified it</h2>
 <h2> [28] 060586324648 - io_uring: park SQPOLL thread if it's percpu</h2>
+<p>通过kthread_should_park和kthread_parkme确保内核线程能够在系统暂停情况下预期停车</p>
 <h2> [27] 3ec482d15cb9 - io_uring: restrict IORING_SETUP_SQPOLL to root</h2>
+<p>rt</p>
 <h2> [26] 704236672eda - tools/io_uring: remove IOCQE_FLAG_CACHEHIT</h2>
+<p>rt</p>
 <h2> [25] 25adf50fe25d - io_uring: fix double free in case of fileset regitration failure</h2>
+<p>rt(如题)</p>
 <h2> [24] 8142bd82a59e - tools headers: Update x86's syscall_64.tbl and uapi/asm-generic/unistd</h2>
+<p>perf trace -s io_uring-cp ~acme/isos/RHEL-x86_64-dvd1.iso ~/bla</p>
+<p>perf trace -e io_uring* -s io_uring-cp ~acme/isos/RHEL-x86_64-dvd1.iso ~/bla</p>
 <h2> [23] 9bf7933fc3f3 - io_uring: offload write to async worker in case of -EAGAIN</h2>
+<p>将[12] 31b515106428实现的io_read优化复刻到io_write</p>
 <h2> [22] 9e75ad5d8f39 - io_uring: fix big-endian compat signal mask handling</h2>
+<p>详见commit message</p>
 <h2> [21] bf33a7699e99 - io_uring: mark me as the maintainer</h2>
+<p>add maintainer</p>
 <h2> [20] fd6fab2cb78d - io_uring: retry bulk slab allocs as single allocs</h2>
+<p>增加kmem_cache_alloc_bulk分配失败就用kmem_cache_alloc重试分配一个的处理</p>
 <h2> [19] 8c838788775a - io_uring: fix poll races</h2>
+<p>详见commit message</p>
 <h2> [18] 09bb839434bd - io_uring: fix fget/fput handling</h2>
+<p>把文件管理放到更高层次，统一处理</p>
 <h2> [17] d530a402a114 - io_uring: add prepped flag</h2>
+<p>用req-&gt;flags &amp; REQ_F_PREPPED代替kiocb-&gt;ki_filp来判断是否prepped</p>
 <h2> [16] e0c5c576d507 - io_uring: make io_read/write return an integer</h2>
+<p>详见commit message</p>
 <h2> [15] e65ef56db494 - io_uring: use regular request ref counts</h2>
+<p>使用ref_count来管理req的全生命周期，每个req初始化2个ref，如果req已提交，那么ref--，如果req异常退出或者正常结束，再ref--</p>
 <h2> [14] b5420237ec81 - mm: refactor readahead defines in mm.h</h2>
+<p>详见commit message</p>
 <h2> [13] 21b4aa5d20fd - io_uring: add a few test tools</h2>
 <p>封装了liburing和增加了两个用户态用例：</p>
 <ul>
@@ -3661,11 +3677,16 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [10] c16361c1d805 - io_uring: add io_kiocb ref count</h2>
 <p>除了readv/writev等，增加了one-shot poll，即支持poll一个，新的需要重新poll</p>
 <p><u>list_del_init重新初始化链表避免内存泄漏等异常行为</u></p>
+<p>IORING_OP_POLL_ADD  - io_poll_complete_work(one-shot poll情况下直接提交给原先相同的workqueue但是work不一样)
+!IORING_OP_POLL_ADD - io_sq_wq_submit_work</p>
+<p>io_poll_remove/io_poll_remove_all - io_poll_remove_one(canceled) - io_poll_complete_work - add_wait_queue</p>
+
+<p>io_poll_queue_proc - add_wait_queue</p>
 <h2> [9] 6c271ce2f1d5 - io_uring: add submission polling</h2>
 <p>支持IORING_SETUP_SQPOLL，用户可以提交IO不需要每次都通过io_uring_enter系统调用，就会自动获取sq_ring</p>
 <p>用kthread（io_sq_thread）来自动获取sq_ring，同时支持用IORING_SETUP_SQ_AFF来绑核</p>
 <p><u>支持设置超时时间，超时后设置IORING_SQ_NEED_WAKEUP，进入wait状态，需要用户重新下发io_uring_enter系统调用带上IORING_ENTER_SQ_WAKEUP才会重新唤醒</u></p>
-<h2> [8] 6b06314c47e1 - io_uring: add file set registration</h2>
+<div class="language-text line-numbers-mode" data-ext="text"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> [8] 6b06314c47e1 - io_uring: add file set registration</h2>
 <h2> [7] f4e65870e5ce - net: split out functions related to registering inflight socket files</h2>
 <p>在原来的系统调用io_uring_register中增加支持map fd，省去相同文件的引用增加释放开销，同时要求map fd后传入IOSQE_FIXED_FILE，这样才会避免重新增加文件引用，算是上一步的性能进一步思考</p>
 <h2> [6] edafccee56ff - io_uring: add support for pre-mapped user IO buffers</h2>
