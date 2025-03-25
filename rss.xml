@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Mon, 24 Mar 2025 09:11:02 GMT</pubDate>
-    <lastBuildDate>Mon, 24 Mar 2025 09:11:02 GMT</lastBuildDate>
+    <pubDate>Tue, 25 Mar 2025 10:51:41 GMT</pubDate>
+    <lastBuildDate>Tue, 25 Mar 2025 10:51:41 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3620,8 +3620,12 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [33] 74f464e97044 - io_uring: fix CQ overflow condition</h2>
 <h2 enter,register=""> [32] b19062a56726 - io_uring: fix possible deadlock between io_uring_</h2>
 <h2> [31] 39036cd27273 - arch: add pidfd and io_uring syscalls everywhere</h2>
+<p>将io_uring从x86推广到其他所有架构</p>
 <h2> [30] 3d6770fbd935 - io_uring: drop io_file_put() 'file' argument</h2>
+<p>rt</p>
 <h2> [29] 917257daa0fe - io_uring: only test SQPOLL cpu after we've verified it</h2>
+<p>只在IORING_SETUP_SQPOLL下使用到sq_thread_idle，因此将sq_thread_idle设置放到IORING_SETUP_SQPOLL下</p>
+<p>判断cpu_possible避免在未使用的cpu上创建内核线程</p>
 <h2> [28] 060586324648 - io_uring: park SQPOLL thread if it's percpu</h2>
 <p>通过kthread_should_park和kthread_parkme确保内核线程能够在系统暂停情况下预期停车</p>
 <h2> [27] 3ec482d15cb9 - io_uring: restrict IORING_SETUP_SQPOLL to root</h2>
