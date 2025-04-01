@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Fri, 28 Mar 2025 10:13:02 GMT</pubDate>
-    <lastBuildDate>Fri, 28 Mar 2025 10:13:02 GMT</lastBuildDate>
+    <pubDate>Tue, 01 Apr 2025 09:21:18 GMT</pubDate>
+    <lastBuildDate>Tue, 01 Apr 2025 09:21:18 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -138,119 +138,11 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
       <link>https://zihu97.github.io/posts/linux/io_uring.html</link>
       <guid>https://zihu97.github.io/posts/linux/io_uring.html</guid>
       <source url="https://zihu97.github.io/rss.xml">io_uring源码解析（逐Patch）</source>
-      <description>io_uring源码解析（逐Patch） git log --grep=&amp;quot;io_uring&amp;quot; --pretty=format:&amp;quot;%h - %s&amp;quot; --reverse --no-merges | \ awk &amp;apos;{lines[NR] = $0} END {for (i = NR; i &amp;gt; 0; i--) printf(&amp;quot;## [%d] %s\n&amp;quot;, i, lines[i]);}&amp;apos; | \ tee io_uring.commit.list</description>
+      <description>io_uring源码解析（逐Patch） git log origin/master --grep=&amp;quot;io_uring&amp;quot; --pretty=format:&amp;quot;%h - %s&amp;quot; --reverse --no-merges | \ awk &amp;apos;{lines[NR] = $0} END {for (i = NR; i &amp;gt; 0; i--) printf(&amp;quot;## [%d] %s\n&amp;quot;, i, lines[i]);}&amp;apos; | \ tee io_uring.commit.list</description>
       <category>tech</category>
       <pubDate>Thu, 20 Mar 2025 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[<h1> io_uring源码解析（逐Patch）</h1>
-<div class="language-text line-numbers-mode" data-ext="text"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> [3508] d55011469b41 - fuse: fix possible deadlock if rings are never initialized</h2>
-<h2> [3507] 182db972c956 - mm: fix error handling in __filemap_get_folio() with FGP_NOWAIT</h2>
-<h2> [3506] bcb0fda3c2da - io_uring/rw: ensure reissue path is correctly handled for IOPOLL</h2>
-<h2> [3505] 00817f0f1c45 - nvme-ioctl: fix leaked requests on mapping error</h2>
-<h2> [3504] 6ebf05189dfc - io_uring/net: save msg_control for compat</h2>
-<h2> [3503] 4614de748e78 - io_uring/rw: clean up mshot forced sync mode</h2>
-<h2> [3502] 74f3e875268f - io_uring/rw: move ki_complete init into prep</h2>
-<h2> [3501] 4e43133c6f23 - io_uring/rw: don't directly use ki_complete</h2>
-<h2> [3500] 67b0025d19f9 - io_uring/rw: forbid multishot async reads</h2>
-<h2> [3499] fb3331f53e3c - io_uring/rsrc: remove unused constants</h2>
-<h2> [3498] 1fc61eeefe10 - io_uring: fix spelling error in uapi io_uring.h</h2>
-<h2> [3497] 1e988c3fe126 - io_uring: prevent opcode speculation</h2>
-<h2> [3496] 13918315c5dc - io-wq: backoff when retrying worker creation</h2>
-<h2> [3495] d6211ebbdaa5 - io_uring/uring_cmd: unconditionally copy SQEs at prep time</h2>
-<h2> [3494] 2b4fc4cd43f2 - io_uring/waitid: setup async data in the prep handler</h2>
-<h2> [3493] 0edf1283a9d1 - io_uring/uring_cmd: remove dead req_has_async_data() check</h2>
-<h2> [3492] e663da62ba86 - io_uring/uring_cmd: switch sqe to async_data on EAGAIN</h2>
-<h2> [3491] 34cae91215c6 - io_uring/uring_cmd: don't assume io_uring_cmd_data layout</h2>
-<h2> [3490] 8802766324e1 - io_uring/kbuf: reallocate buf lists on upgrade</h2>
-<h2> [3489] 06521ac0485e - io_uring/waitid: don't abuse io_tw_state</h2>
-<h2> [3488] 8c8492ca64e7 - io_uring/net: don't retry connect operation on EPOLLERR</h2>
-<h2> [3487] d1fdab8c0679 - io_uring/rw: simplify io_rw_recycle()</h2>
-<h2> [3486] 0d124578fed9 - io_uring: remove !KASAN guards from cache free</h2>
-<h2> [3485] 86e62354eef1 - io_uring/net: extract io_send_select_buffer()</h2>
-<h2> [3484] 2b350f756b7a - io_uring/net: clean io_msg_copy_hdr()</h2>
-<h2> [3483] fefcb0dcd02f - io_uring/net: make io_net_vec_assign() return void</h2>
-<h2> [3482] d19af0e93662 - io_uring: add alloc_cache.c</h2>
-<h2> [3481] 16ac51a0a7aa - io_uring: dont ifdef io_alloc_cache_kasan()</h2>
-<h2> [3480] 299276502d41 - io_uring: include all deps for alloc_cache.h</h2>
-<h2> [3479] d63b0e8a628e - io_uring: fix multishots with selected buffers</h2>
-<h2> [3478] 786412a73e7e - fuse: enable fuse-over-io-uring</h2>
-<h2> [3477] b6236c8407cb - fuse: {io-uring} Prevent mount point hang on fuse-server termination</h2>
-<h2> [3476] 857b0263f30e - fuse: Allow to queue bg requests through io-uring</h2>
-<h2> [3475] c2c9af9a0b13 - fuse: Allow to queue fg requests through io-uring</h2>
-<h2> [3474] 4a9bfb9b6850 - fuse: {io-uring} Handle teardown of ring entries</h2>
-<h2> [3473] c090c8abae4b - fuse: Add io-uring sqe commit and fetch support</h2>
-<h2> [3472] 9ad6344568cc - mm/filemap: change filemap_create_folio() to take a struct kiocb</h2>
-<h2> [3471] a23ad06bfee5 - io_uring/register: use atomic_read/write for sq_flags migration</h2>
-<h2> [3470] 24fe962c86f5 - fuse: {io-uring} Handle SQEs - register commands</h2>
-<h2> [3469] 5e0e02f0d7e5 - futex: Pass in task to futex_queue()</h2>
-<h2> [3468] ff74954e4e93 - io_uring/alloc_cache: get rid of _nocache() helper</h2>
-<h2> [3467] fa3595523d72 - io_uring: get rid of alloc cache init_once handling</h2>
-<h2> [3466] eaf72f7b414f - io_uring/uring_cmd: cleanup struct io_uring_cmd_data layout</h2>
-<h2> [3465] d58d82bd0efd - io_uring/uring_cmd: use cached cmd_op in io_uring_cmd_sock()</h2>
-<h2> [3464] 69a62e03f896 - io_uring/msg_ring: don't leave potentially dangling -&gt;tctx pointer</h2>
-<h2> [3463] 2839ab71ac90 - io_uring/rsrc: Move lockdep assert from io_free_rsrc_node() to caller</h2>
-<h2> [3462] b73de0da5012 - io_uring/rsrc: remove unused parameter ctx for io_rsrc_node_alloc()</h2>
-<h2> [3461] bb2d76344bc8 - io_uring: clean up io_uring_register_get_file()</h2>
-<h2> [3460] 5719e2823565 - io_uring/rsrc: Simplify buffer cloning by locking both rings</h2>
-<h2> [3459] 561e3a0c40dc - io_uring/fdinfo: fix io_uring_show_fdinfo() misuse of -&gt;d_iname</h2>
-<h2> [3458] bab4b2cca027 - io_uring: reuse io_should_terminate_tw() for cmds</h2>
-<h2> [3457] 53745105efc3 - io_uring: Factor out a function to parse restrictions</h2>
-<h2> [3456] 6f7a644eb7db - io_uring/register: cache old SQ/CQ head reading for copies</h2>
-<h2> [3455] 2c5aae129f42 - io_uring/register: document io_register_resize_rings() shared mem usage</h2>
-<h2> [3454] 8911798d3e8a - io_uring/register: use stable SQ/CQ ring data during resize</h2>
-<h2> [3453] 19d340a2988d - io_uring/rsrc: require cloned buffers to share accounting contexts</h2>
-<h2> [3452] c1c03ee7957e - io_uring/rsrc: fixup io_clone_buffers() error handling</h2>
-<h2> [3451] a13030fd194c - io_uring: simplify the SQPOLL thread check when cancelling requests</h2>
-<h2> [3450] e32dcdb0af9f - btrfs: add io_uring interface for encoded writes</h2>
-<h2> [3449] 94d57442e56d - io_uring: expose read/write attribute capability</h2>
-<h2> [3448] bd2703b42dec - io_uring: don't touch sqd-&gt;thread off tw add</h2>
-<h2> [3447] 4b7cfa8b6c28 - io_uring/sqpoll: zero sqd-&gt;thread on tctx errors</h2>
-<h2> [3446] b08e02045002 - io_uring/rw: don't gate retry on completion context</h2>
-<h2> [3445] d803d123948f - io_uring/rw: handle -EAGAIN retry at IO completion time</h2>
-<h2> [3444] 9ac273ae3dc2 - io_uring/rw: use io_rw_recycle() from cleanup path</h2>
-<h2> [3443] 4e15fa8305de - io_uring_poll: kill the no longer necessary barrier after poll_wait()</h2>
-<h2> [3442] 93e505a300aa - tools: ynl-gen-c: improve support for empty nests</h2>
-<h2> [3441] c9a40292a44e - io_uring/eventfd: ensure io_eventfd_signal() defers another RCU period</h2>
-<h2> [3440] 60495b08cf7a - io_uring: silence false positive warnings</h2>
-<h2> [3439] c21b89d495ba - btrfs: don't read from userspace twice in btrfs_uring_encoded_read()</h2>
-<h2> [3438] b0af20d33f63 - io_uring: add io_uring_cmd_get_async_data helper</h2>
-<h2> [3437] 3347fa658a1b - io_uring/cmd: add per-op data to struct io_uring_cmd_data</h2>
-<h2> [3436] dadf03cfd4ea - io_uring/cmd: rename struct uring_cache to io_uring_cmd_data</h2>
-<h2> [3435] c83c846231db - io_uring/timeout: fix multishot updates</h2>
-<h2> [3434] 2a51c327d4a4 - io_uring/rsrc: simplify the bvec iter count calculation</h2>
-<h2> [3433] ed123c948d06 - io_uring/kbuf: use pre-committed buffer address for non-pollable file</h2>
-<h2> [3432] c6e60a0a68b7 - io_uring/net: always initialize kmsg-&gt;msg.msg_inq upfront</h2>
-<h2> [3431] d62c2f0d8275 - io_uring: ensure io_queue_deferred() is out-of-line</h2>
-<h2> [3430] a9c83a0ab66a - io_uring/timeout: flush timeouts outside of the timeout lock</h2>
-<h2> [3429] 38fc96a58ce4 - io_uring/rw: fix downgraded mshot read</h2>
-<h2> [3428] c5f719161460 - io_uring/rw: always clear -&gt;bytes_done on io_async_rw setup</h2>
-<h2> [3427] 21adbcaa8007 - io_uring/rw: use NULL for rw-&gt;free_iovec assigment</h2>
-<h2> [3426] 1143be17d7ac - io_uring/rw: don't mask in f_iocb_flags</h2>
-<h2> [3425] ce9464081d51 - io_uring/msg_ring: Drop custom destructor</h2>
-<h2> [3424] ef623a647f42 - io_uring: Move old async data allocation helper to header</h2>
-<h2> [3423] d7f11616edf5 - io_uring/rw: Allocate async data through helper</h2>
-<h2> [3422] f49a85371d8c - io_uring/net: Allocate msghdr async data through helper</h2>
-<h2> [3421] e9447dc0b18d - io_uring/uring_cmd: Allocate async data through generic helper</h2>
-<h2> [3420] 1210872918ef - io_uring/poll: Allocate apoll with generic alloc_cache helper</h2>
-<h2> [3419] b28465670606 - io_uring/futex: Allocate ifd with generic alloc_cache helper</h2>
-<h2> [3418] 49f7a3098cc2 - io_uring: Add generic helper to allocate async data</h2>
-<h2> [3417] e33ac68e5e21 - io_uring/sqpoll: fix sqpoll error handling races</h2>
-<h2> [3416] 479b2f4590be - io_uring: Fold allocation into alloc_cache helper</h2>
-<h2> [3415] 29b95ac91792 - io_uring: prevent reg-wait speculations</h2>
-<h2> [3414] de3b9e2e4819 - io_uring: don't vmap single page regions</h2>
-<h2> [3413] 2e6406a20a39 - io_uring: clean up io_prep_rw_setup()</h2>
-<h2> [3412] febfbf767174 - io_uring/kbuf: fix unintentional sign extension on shift of reg.bgid</h2>
-<h2> [3411] 59a7d12a7fb5 - io_uring: introduce attributes for read/write and PI support</h2>
-<h2> [3410] 7cd7b9575270 - io_uring/memmap: unify io_uring mmap'ing code</h2>
-<h2> [3409] ef62de3c4ad5 - io_uring/kbuf: use region api for pbuf rings</h2>
-<h2> [3408] 90175f3f5032 - io_uring/kbuf: remove pbuf ring refcounting</h2>
-<h2> [3407] 78fda3d05641 - io_uring/kbuf: use mmap_lock to sync with mmap</h2>
-<h2> [3406] 81a4058e0cd0 - io_uring: use region api for CQ</h2>
-<h2> [3405] 8078486e1d53 - io_uring: use region api for SQ</h2>
-<h2> [3404] 02255d55260a - io_uring: pass ctx to io_register_free_rings</h2>
-<h2> [3403] 087f997870a9 - io_uring/memmap: implement mmap for regions</h2>
-<h2> [3402] 1e21df691ffa - io_uring/memmap: implement kernel allocated regions</h2>
-<h2> [3401] 4b851d20d325 - io_uring/memmap: add IO_REGION_F_SINGLE_REF</h2>
-<h2> [3400] a90558b36cce - io_uring/memmap: helper for pinning region pages</h2>
+<div class="language-text line-numbers-mode" data-ext="text"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> [3400] a90558b36cce - io_uring/memmap: helper for pinning region pages</h2>
 <h2> [3399] c4d0ac1c1567 - io_uring/memmap: optimise single folio regions</h2>
 <h2> [3398] 226ae1b4d111 - io_uring/memmap: reuse io_free_region for failure path</h2>
 <h2> [3397] fc5f22a64649 - io_uring/memmap: account memory before pinning</h2>
@@ -3577,10 +3469,29 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [76] a4c0b3decb33 - io_uring: fix io_sq_thread_stop running in front of io_sq_thread</h2>
 <h2> [75] aa1fa28fc73e - io_uring: add support for recvmsg()</h2>
 <h2> [74] 0fa03c624d8f - io_uring: add support for sendmsg()</h2>
+<p>详见commit message</p>
 <h2> [73] 9e645e1105ca - io_uring: add support for sqe links</h2>
+<p>不是cached放到wq或者kthread做的都要copy是因为很有可能当前的sqe被新的覆盖了还没做到，这时候如果用老的话会出问题，所以这些都要生成一个sqe_copy</p>
+<p>io_import_iovec返回的是实际可读取的字节数，call_read_iter/call_write_iter返回的实际读取的字节数，两者不一样说明读取失败</p>
+<p>drain类似于event，一定要前面的做完才能开始后面的，link是一批要放在一起按顺序做，也能实现部分类似drain的功能</p>
+<p>io_ring_submit/io_submit_sqes拆分成了io_submit_sqe(pre-handle + 判断link) + io_queue_sqe(提交IO处理)，逻辑如下：</p>
+<p>io_ring_submit/io_submit_sqes - 1）!link(io_queue_sqe)
+- 2）第一个link(作为link_list的head)
+- 3）之后的link(加入link_list)
+- 4）link之后第一个!link(加入link_list，即一堆link+一个非link（作为结尾）批量提交)
+- 5）第一个!link之后的!link/link(将第一个link提交IO且根据当前节点选择goto 1或2)
+- 6）本次to_submit完，讲link_list提交IO</p>
+<p>link的执行流程是第一个link做完后，在该req的后处理流程中继续处理link_list上req
+io_put_req - io_free_req - link - io_fail_links(终止link_list后续所有req)
+- io_req_link_next(提交link_list上下一个req)
+- __io_free_req（原释放流程）</p>
+<p>通过INIT_LIST_HEAD + list_splice把当前req的link_list迁移给下一个req,就可以重复上面的操作，因为原来所有的link节点只挂在了head的link_list上</p>
 <h2> [72] 60c112b0ada0 - io_uring: ensure req-&gt;file is cleared on allocation</h2>
+<p>注意看commit message里面的调用栈，还原下就是用kernel thread处理时,在io_req_set_file判断不是fixed file会报错走异常退出流程到io_free_req,而io_free_req判断不是fixed file且req-&gt;file非空（可能是未初始化或异常值）会调用fput，导致访问无效的文件指针触发GPF</p>
 <h2> [71] 355e8d26f719 - io_uring: fix memory leak of UNIX domain socket inode</h2>
+<p>详见commit message，查了下源码，__sock_release中确实会判断sock-&gt;file非空才会调用iput释放inode</p>
 <h2> [70] 9d93a3f5a0c0 - io_uring: punt short reads to async context</h2>
+<p>考虑部分cached的短读取且non-block情况，会出现只读取完cached部分然后通知用户再重新下发sqe读取剩余部分，这样会带来多余的系统调用，修改为将剩余部分放到async context中让内核主动完成</p>
 <h2> [69] f95d050cdc5d - perf arm64: Fix mksyscalltbl when system kernel headers are ahead of the kernel</h2>
 <h2> [68] a278682dad37 - io_uring: Fix __io_uring_register() false success</h2>
 <h2> [67] 004d564f9087 - tools/io_uring: sync with liburing</h2>
@@ -3674,9 +3585,7 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [28] 060586324648 - io_uring: park SQPOLL thread if it's percpu</h2>
 <p>通过kthread_should_park和kthread_parkme确保内核线程能够在系统暂停情况下预期停车</p>
 <h2> [27] 3ec482d15cb9 - io_uring: restrict IORING_SETUP_SQPOLL to root</h2>
-<p>rt</p>
 <h2> [26] 704236672eda - tools/io_uring: remove IOCQE_FLAG_CACHEHIT</h2>
-<p>rt</p>
 <h2> [25] 25adf50fe25d - io_uring: fix double free in case of fileset regitration failure</h2>
 <p>rt(如题)</p>
 <h2> [24] 8142bd82a59e - tools headers: Update x86's syscall_64.tbl and uapi/asm-generic/unistd</h2>
@@ -3735,7 +3644,7 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <p>支持IORING_SETUP_SQPOLL，用户可以提交IO不需要每次都通过io_uring_enter系统调用，就会自动获取sq_ring</p>
 <p>用kthread（io_sq_thread）来自动获取sq_ring，同时支持用IORING_SETUP_SQ_AFF来绑核</p>
 <p><u>支持设置超时时间，超时后设置IORING_SQ_NEED_WAKEUP，进入wait状态，需要用户重新下发io_uring_enter系统调用带上IORING_ENTER_SQ_WAKEUP才会重新唤醒</u></p>
-<div class="language-text line-numbers-mode" data-ext="text"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> [8] 6b06314c47e1 - io_uring: add file set registration</h2>
+<div class="language-text line-numbers-mode" data-ext="text"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> [8] 6b06314c47e1 - io_uring: add file set registration</h2>
 <h2> [7] f4e65870e5ce - net: split out functions related to registering inflight socket files</h2>
 <p>在原来的系统调用io_uring_register中增加支持map fd，省去相同文件的引用增加释放开销，同时要求map fd后传入IOSQE_FIXED_FILE，这样才会避免重新增加文件引用，算是上一步的性能进一步思考</p>
 <h2> [6] edafccee56ff - io_uring: add support for pre-mapped user IO buffers</h2>
