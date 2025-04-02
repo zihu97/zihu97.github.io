@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Tue, 01 Apr 2025 09:21:18 GMT</pubDate>
-    <lastBuildDate>Tue, 01 Apr 2025 09:21:18 GMT</lastBuildDate>
+    <pubDate>Wed, 02 Apr 2025 09:29:27 GMT</pubDate>
+    <lastBuildDate>Wed, 02 Apr 2025 09:29:27 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3456,15 +3456,29 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [89] 08f5439f1df2 - io_uring: add need_resched() check in inner poll loop</h2>
 <h2> [88] a3a0e43fd770 - io_uring: don't enter poll loop if we have CQEs pending</h2>
 <h2> [87] 500f9fbadef8 - io_uring: fix potential hang with polled IO</h2>
+<p>rt，这个很有意思，是间断性释放锁这样可以处理其他任务</p>
 <h2> [86] 77cd0d7b3f25 - xsk: add support for need_wakeup flag in AF_XDP rings</h2>
+<p>io_uring的SQPOLL的kthread在没有任务时会自动休眠，需要用户wake_up，当前这个组件加入了这个idea</p>
 <h2> [85] a982eeb09b60 - io_uring: fix an issue when IOSQE_IO_LINK is inserted into defer list</h2>
+<p>本来是link req被塞到defer list但是依旧可以继续处理，改成了被drain了就统一放到defer，解决了依赖再处理其他包括link</p>
 <h2> [84] 99c79f6692cc - io_uring: fix manual setup of iov_iter for fixed buffers</h2>
 <h2> [83] d0ee879187df - io_uring: fix KASAN use after free in io_sq_wq_submit_work</h2>
 <h2> [82] 36703247d5f5 - io_uring: ensure -&gt;list is initialized for poll commands</h2>
 <h2> [81] 9310a7ba6de8 - io_uring: track io length in async_list based on bytes</h2>
 <h2> [80] bd11b3a391e3 - io_uring: don't use iov_iter_advance() for fixed buffers</h2>
+<p>rt</p>
 <h2> [79] c0e48f9dea91 - io_uring: add a memory barrier before atomic_read</h2>
+<p>详见commit message，问题出在wq已经atomic_dec_return但是atomic_read还是1导致最后一个req在async_list上没有被处理，因为wq已经认为是empty了，如果atomic_read读成0，那么会重新queue_work那就能处理了</p>
+<p>因为本来async_list是跟着上一个req一起处理的，本来上一个req没开始做就放到async_list那就自然而然能做了，上一个req已经做完了，那么async_list作为一个新的req做也是一样，现在是上一个req做到末尾了，而刚加入async_list又没重新queue_work导致的</p>
 <h2> [78] f7b76ac9d17e - io_uring: fix counter inc/dec mismatch in async_list</h2>
+<p>当前有5种type的req：</p>
+<p>i）  cached    (__io_submit_sqe直接处理IO)</p>
+<p>ii） non-cached(-EAGAIN, 如果当前req不是和前一个req的pos紧邻，提交给workqueue)</p>
+<p>iii）async_list(-EAGAIN, 如果当前req是和前一个req的pos紧邻，放到async_list上)</p>
+<p>iv） defer_list(设置IOSQE_IO_DRAIN的会将之后阻塞的IO放到defer_list上，在每一个req的io_commit_cqring时轮训defer_list上的req判断是否已经不被阻塞，若是则设置为REQ_F_IO_DRAINED，再提交给workqueue)</p>
+<p>v）  link_list (设置IOSQE_IO_LINK的会将一组link的IO放到link_list上, 如[73] 9e645e1105ca中方式提交后在link_list的head req的io_put_req时判断当前req是否成功，若不是则取消link_list上剩余所有req，若是则准备提交link_list上的下一个req，设置为REQ_F_LINK_DONE，再提交给workqueue)</p>
+<p>也就是说除了i）和 iii）都是会将当前req直接提交workqueue处理，而iii）是和当前的req一起处理，即先处理完当前req，然后将当前req上的async_list上的req一起处理，因为是紧邻着的，没必要新建一个work</p>
+<p>当前这个节点就是因为iv）和 v）类型不同，所以没必要加入iii）的引用计数处理</p>
 <h2> [77] dbd0f6d6c2a1 - io_uring: fix the sequence comparison in io_sequence_defer</h2>
 <h2> [76] a4c0b3decb33 - io_uring: fix io_sq_thread_stop running in front of io_sq_thread</h2>
 <h2> [75] aa1fa28fc73e - io_uring: add support for recvmsg()</h2>
