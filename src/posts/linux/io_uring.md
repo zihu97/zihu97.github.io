@@ -3328,17 +3328,58 @@ tee io_uring.commit.list
 ## [89] 08f5439f1df2 - io_uring: add need_resched() check in inner poll loop
 ## [88] a3a0e43fd770 - io_uring: don't enter poll loop if we have CQEs pending
 ## [87] 500f9fbadef8 - io_uring: fix potential hang with polled IO
+
+rt，这个很有意思，是间断性释放锁这样可以给其他任务有获取锁的机会来处理任务
+
+
+
 ## [86] 77cd0d7b3f25 - xsk: add support for need_wakeup flag in AF_XDP rings
+
+io_uring的SQPOLL的kthread在没有任务时会自动休眠，需要用户wake_up，当前这个组件加入了这个idea
+
+
+
 ## [85] a982eeb09b60 - io_uring: fix an issue when IOSQE_IO_LINK is inserted into defer list
+
+本来是link req被塞到defer list但是依旧可以继续处理，改成了被drain了就统一放到defer，解决了依赖再处理其他包括link
+
+
+
 ## [84] 99c79f6692cc - io_uring: fix manual setup of iov_iter for fixed buffers
 ## [83] d0ee879187df - io_uring: fix KASAN use after free in io_sq_wq_submit_work
 ## [82] 36703247d5f5 - io_uring: ensure ->list is initialized for poll commands
 ## [81] 9310a7ba6de8 - io_uring: track io length in async_list based on bytes
 ## [80] bd11b3a391e3 - io_uring: don't use iov_iter_advance() for fixed buffers
+
+rt
+
+
+
 ## [79] c0e48f9dea91 - io_uring: add a memory barrier before atomic_read
+
+详见commit message，问题出在wq已经atomic_dec_return但是atomic_read还是1导致最后一个req在async_list上没有被处理，因为wq已经认为是empty了，如果atomic_read读成0，那么会重新queue_work那就能处理了
+
+因为本来async_list是跟着上一个req一起处理的，本来上一个req没开始做就放到async_list那就自然而然能做了，上一个req已经做完了，那么async_list作为一个新的req做也是一样，现在是上一个req做到末尾了，而刚加入async_list又没重新queue_work导致的
+
+
+
 ## [78] f7b76ac9d17e - io_uring: fix counter inc/dec mismatch in async_list
 
+当前有5种type的req：
 
+i）  cached    (__io_submit_sqe直接处理IO)
+
+ii） non-cached(-EAGAIN, 如果当前req不是和前一个req的pos紧邻，提交给workqueue)
+
+iii）async_list(-EAGAIN, 如果当前req是和前一个req的pos紧邻，放到async_list上)
+
+iv） defer_list(设置IOSQE_IO_DRAIN的会将之后阻塞的IO放到defer_list上，在每一个req的io_commit_cqring时轮训defer_list上的req判断是否已经不被阻塞，若是则设置为REQ_F_IO_DRAINED，再提交给workqueue)
+
+v）  link_list (设置IOSQE_IO_LINK的会将一组link的IO放到link_list上, 如[73] 9e645e1105ca中方式提交后在link_list的head req的io_put_req时判断当前req是否成功，若不是则取消link_list上剩余所有req，若是则准备提交link_list上的下一个req，设置为REQ_F_LINK_DONE，再提交给workqueue)
+
+也就是说除了i）和 iii）都是会将当前req直接提交workqueue处理，而iii）是和当前的req一起处理，即先处理完当前req，然后将当前req上的async_list上的req一起处理，因为是紧邻着的，没必要新建一个work
+
+当前这个节点就是因为iv）和 v）类型不同，所以没必要加入iii）的引用计数处理
 
 
 
