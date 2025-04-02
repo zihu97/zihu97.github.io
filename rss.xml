@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Wed, 02 Apr 2025 09:29:27 GMT</pubDate>
-    <lastBuildDate>Wed, 02 Apr 2025 09:29:27 GMT</lastBuildDate>
+    <pubDate>Wed, 02 Apr 2025 09:38:13 GMT</pubDate>
+    <lastBuildDate>Wed, 02 Apr 2025 09:38:13 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3456,7 +3456,7 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [89] 08f5439f1df2 - io_uring: add need_resched() check in inner poll loop</h2>
 <h2> [88] a3a0e43fd770 - io_uring: don't enter poll loop if we have CQEs pending</h2>
 <h2> [87] 500f9fbadef8 - io_uring: fix potential hang with polled IO</h2>
-<p>rt，这个很有意思，是间断性释放锁这样可以处理其他任务</p>
+<p>rt，这个很有意思，是间断性释放锁这样可以给其他任务有获取锁的机会来处理任务</p>
 <h2> [86] 77cd0d7b3f25 - xsk: add support for need_wakeup flag in AF_XDP rings</h2>
 <p>io_uring的SQPOLL的kthread在没有任务时会自动休眠，需要用户wake_up，当前这个组件加入了这个idea</p>
 <h2> [85] a982eeb09b60 - io_uring: fix an issue when IOSQE_IO_LINK is inserted into defer list</h2>
