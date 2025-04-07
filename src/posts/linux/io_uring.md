@@ -3309,24 +3309,146 @@ tee io_uring.commit.list
 ## [108] 32960613b7c3 - io_uring: correctly handle non ->{read,write}_iter() file_operations
 ## [107] 5262f567987d - io_uring: IORING_OP_TIMEOUT support
 ## [106] 9831a90ce643 - io_uring: use cond_resched() in sqthread
+
+若代码路径可能长时间占用 CPU（如循环处理大量数据），优先使用 cond_resched
+
+若等待时间极短且需避免任务切换开销（如自旋锁），使用 cpu_relax
+
+
+
 ## [105] a1041c27b64c - io_uring: fix potential crash issue due to io_get_req failure
+
+rt
+
+
+
 ## [104] 6cc47d1d2a9b - io_uring: ensure poll commands clear ->sqe
+
+这里指的应该是io_poll_add中遇到信号处理的时候会执行io_poll_wake，会将poll请求转移到workqueue中，此时会判断req->submit.sqe->opcode选择放到哪个workqueue中(这是[98] 54a91f3bb9b9引入的，用于提高缓冲写的性能)，但是其他方式都会req->submit.sqe重新赋值为req的copy，而poll没有，所以通过判空来处理
+
+
+
 ## [103] 5f5ad9ced336 - io_uring: fix use-after-free of shadow_req
 ## [102] 954dab193d19 - io_uring: use kmemdup instead of kmalloc and memcpy
+
+rt
+
+
+
 ## [101] 5277deaab9f9 - io_uring: increase IORING_MAX_ENTRIES to 32K
+
+增大io_uring的entry深度
+
+
+
 ## [100] b2a9eadab857 - io_uring: make sqpoll wakeup possible with getevents
+
+将[9] 6c271ce2f1d5中的no wait cq去掉，也就是支持在轮询cq时支持唤醒SQPOLL轮询，即变为
+
+```
+IORING_SETUP_SQPOLL  - io_sq_thread(内核线程)          - io_submit_sqes - io_submit_sqe
+                                                       - IORING_SETUP_IOPOLL  - io_iopoll_check - io_iopoll_getevents - io_do_iopoll - io_iopoll_complete
+                     - IORING_ENTER_GETEVENTS(wait cq)
+
+!IORING_SETUP_SQPOLL - to_submit（submit sq）          - io_ring_submit - io_submit_sqe - （cached IO 直接提交/io_sq_wq_submit_work(non-cached IO 放到wq异步提交)）- __io_submit_sqe(cached IO 直接提交) - IORING_SETUP_IOPOLL  - io_complete_rw_iopoll
+                                                          - io_iopoll_req_issued(不是-EAGAIN就提交给ctx->poll_list)
+                                   - !IORING_SETUP_IOPOLL - io_complete_rw
+                     - IORING_ENTER_GETEVENTS(wait cq) - IORING_SETUP_IOPOLL  - io_iopoll_check(轮询)
+                                                       - !IORING_SETUP_IOPOLL - io_cqring_wait (等待中断)
+```
+
+
+
 ## [99] 6d5d5ac522b2 - io_uring: extend async work merging
+
+将[12] 31b515106428的机制从严格顺序命中扩展为只要和req处在同一页面（比如req跨两个页面，只要新的req在这两个页面内）都支持合并
+
+
+
 ## [98] 54a91f3bb9b9 - io_uring: limit parallelism of buffered writes
+
+考虑到缓冲写会竞争锁，而且也不需要特别高的并行度，因此新开了一个workqueue同时限制深度专门用于缓冲写避免过高的锁竞争提升性能
+
+
+
 ## [97] 18d9be1a970c - io_uring: add io_queue_async_work() helper
+
+rt
+
+
+
 ## [96] c576666863b7 - io_uring: optimize submit_and_wait API
+
+```
+io_submit_sqes/io_ring_submit - io_queue_sqe/io_queue_link_head - __io_queue_sqe - __io_submit_sqe(force_nonblock=true)
+                                                                                 - io_sq_wq_submit_work - __io_submit_sqe(force_nonblock=false)
+
+--->
+
+io_submit_sqes(force_nonblock=true)/io_ring_submit(force_nonblock) - io_queue_sqe/io_queue_link_head - __io_queue_sqe - __io_submit_sqe(force_nonblock)
+                                                                                                                           - io_sq_wq_submit_work - __io_submit_sqe(=false)
+
+io_ring_submit中的force_nonblock分3种情况 1）一组link以normal req结尾提交，true
+                                        2）一组link，to_submit结束提交，block_for_last(等提交的全做完，且cq不足最小完成数即不能马上返回，设为true)
+                                        3）to_submit的最后一个req，block_for_last(block_for_last=true时为false)
+
+即to_submit的最后一个req或者不用等提交的全做完或者cq已经满足最小完成数，那么block住，避免陷入async_list带来的异步开销,TODO这块其实不明白为什么可以这么设计
+```
+
+
+
 ## [95] 4fe2c963154c - io_uring: add support for link with drain
+
+支持IOSQE_IO_LINK和IOSQE_IO_DRAIN同时设置给同一个req，原先如[85] a982eeb09b60无法处理这种情况，是先处理IOSQE_IO_DRAIN再处理IOSQE_IO_LINK
+
+代码如commit message实现，如果link中有一个设置DRAIN，那么link head设置DRAIN,然后插入一个设置了DRAIN的shadow req到defer_list尾,换句话说就是如果一堆link中有DRAIN，那么这一堆link都变为DRAIN，但如果给每一个req都设置为DRAIN又无法保证最后一个是和link一起完成的，所以当前方式是link head设置为DRAIN，末尾增加一个哨兵req设置为DRAIN
+
+
+
 ## [94] 8776f3fa15a5 - io_uring: fix wrong sequence setting logic
+
+io_sq_thread会批量取IO_IOPOLL_BATCH个sqes，原来是submit的时候填充seq，但如果批量中的sq某一个设置了DRAIN，导致cached_sq_head暴增使得seq不是当前本来的seq，就会出现，当前的req的seq需要等后面的req的seq做完，就会永远不会退出，因此改成了每一次取sq就设置当前的seq，确保当前的req一定是当前的seq
+
+
+
 ## [93] ac90f249e15c - io_uring: expose single mmap capability
+
+通过增加IORING_FEAT_SINGLE_MMAP可以提示用户kernel是否支持single mmap，按需选择
+
+
+
 ## [92] 0a56e0603fa1 - perf arch powerpc: Sync powerpc syscall.tbl
+
+rt
+
+
+
 ## [91] 75b28affdd6a - io_uring: allocate the two rings together
+
+将sq和cq合并到同一个ring，将本来sq_ring/cq_ring/sq_array3次mmap减少为ring/sq_array减少为2次mmap
+
+用check_add_overflow判断是否overflow
+
+
+
 ## [90] 27c4d3a3252f - fs/io_uring.c: convert put_page() to put_user_page*()
+
+详见commit message，put_user_pages和put_user_page包装了原来的put_page，同时put_user_pages_dirty_lock等考虑了dirty page的情况，所以统一换成put_user_page*()函数，一般在get_user_pages失败情况下会调用put_user_pages，然后如果有DMA这样操作怀疑有dirty_page那么释放时调用put_user_pages_dirty_lock
+
+
+
 ## [89] 08f5439f1df2 - io_uring: add need_resched() check in inner poll loop
+
+在io_iopoll_reap_events中增加cond_resched显式调度避免长时间延迟导致softlockup
+
+
+
 ## [88] a3a0e43fd770 - io_uring: don't enter poll loop if we have CQEs pending
+
+如果已经有cqe产生的情况下，再进入loop，那会出现ctx->poll_list为空，poll以为还没开始产生，但是其实已经cqe产生完成导致一直轮询不退出
+
+
+
 ## [87] 500f9fbadef8 - io_uring: fix potential hang with polled IO
 
 rt，这个很有意思，是间断性释放锁这样可以给其他任务有获取锁的机会来处理任务
