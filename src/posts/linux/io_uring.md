@@ -3294,20 +3294,107 @@ tee io_uring.commit.list
 ## [123] fb5ccc98782f - io_uring: Fix broken links with offloading
 ## [122] 84d55dc5b9e5 - io_uring: Fix corrupted user_data
 ## [121] a1f58ba46f79 - io_uring: correct timeout req sequence when inserting a new entry
+
+
+
+
+
 ## [120] ef03681ae8df - io_uring : correct timeout req sequence when waiting timeout
+
+超时请求会返回一个cq，所以所有还在timeout_list中的seq都要+1
+
+
+
 ## [119] bc808bced39f - io_uring: revert "io_uring: optimize submit_and_wait API"
+
+回退[96] c576666863b7和[112] bf7ec93c644c做的优化，因为这个优化不能普遍适用于所有场景
+
+
+
 ## [118] 8b07a65ad30e - io_uring: fix logic error in io_timeout
+
+修复[116] 5da0fb1ab34c中的逻辑错误
+
+
+
 ## [117] 491381ce07ca - io_uring: fix up O_NONBLOCK handling for sockets
+
+```
+针对非普通文件的非阻塞IO处理优化
+文件可以通过ls -l命令首字符识别：
+-：普通文件
+d：目录
+c：字符设备
+b：块设备
+s：套接字
+p：管道
+l：符号链接
+```
+
+
+
 ## [116] 5da0fb1ab34c - io_uring: consider the overflow of sequence for timeout req
+
+要结合[118] 8b07a65ad30e一起看，如果计算seq overflow那就会导致timeout_list顺序错乱，因为timeout_list是让最短timeout时间的先结束，所以一定要保序，而drain每个是独立的，也就是先来的req先drain，所以不需要考虑overflow（因为只要比较当前的req是否等于超时的req即可）
+
+通过复用req->submit.sequence报错count，这样就可以根据结果seq算回原来的cached_sq_head是多少，再将overflow的加上UINT_MAX就可以当作原本的head值再进行判断
+
+
+
 ## [115] 7adf4eaf60f3 - io_uring: fix sequence logic for timeout requests
+
+原来defer_list和timeout_list上的req都只是包含timeout信息或者drained信息，但io_sequence_defer会将两个信息都比较，因此拆分开来，只比较当前req拥有的信息
+
+
+
 ## [114] 8a9973408177 - io_uring: only flush workqueues on fileset removal
 ## [113] 6805b32ec2b0 - io_uring: remove wait loop spurious wakeups
+
+rt
+
+
+
 ## [112] bf7ec93c644c - io_uring: fix reversed nonblock flag for link submission
+
+修改[96] c576666863b7中的逻辑
+
+```
+io_ring_submit中的force_nonblock分3种情况 2）一组link，to_submit结束提交，!block_for_last(等提交的全做完，且cq不足最小完成数即不能马上返回，设为true，该组变为false)
+
+即to_submit的最后一个req或者不用等提交的全做完或者cq已经满足最小完成数或者to_submit结束提交还有link，那么block住，避免陷入async_list带来的异步开销
+```
+
+
+
 ## [111] bdf200731145 - io_uring: use __kernel_timespec in timeout ABI
+
+rt
+
+
+
 ## [110] bda521624e75 - io_uring: make CQ ring wakeups be more efficient
+
+该处理是考虑到ctx->wait被多次唤醒在批处理IO的情况下，wait_event*()会多次唤醒休眠，因此将wait_event_interruptible拆解回了prepare_to_wait+schedule+finish_wait，在wait_event_interruptible原本绑定的唤醒函数autoremove_wake_function上增加了是否需要被wake_up的判断来减少反复唤醒休眠唤醒
+
+
+
 ## [109] daa5de541584 - io_uring: compare cached_cq_tail with cq.head in_io_uring_poll
 ## [108] 32960613b7c3 - io_uring: correctly handle non ->{read,write}_iter() file_operations
+
+rt
+
+
+
 ## [107] 5262f567987d - io_uring: IORING_OP_TIMEOUT support
+
+支持了timeout功能：
+
+1）支持hrtimer超时回调io_timeout_fn，返回值赋值为-ETIME
+
+2）支持N events完成超时，类似于DRAIN设置seq在每一次cq时判断timeout_list上之前发下来的req是否已满足N events（timeout_list将所有N events的req都加入到timeout_list中，按照从后向前遍历找到第一个比当前的req的N events小的链表节点后插入）
+
+
+
 ## [106] 9831a90ce643 - io_uring: use cond_resched() in sqthread
 
 若代码路径可能长时间占用 CPU（如循环处理大量数据），优先使用 cond_resched
@@ -3392,7 +3479,7 @@ io_ring_submit中的force_nonblock分3种情况 1）一组link以normal req结�
                                         2）一组link，to_submit结束提交，block_for_last(等提交的全做完，且cq不足最小完成数即不能马上返回，设为true)
                                         3）to_submit的最后一个req，block_for_last(block_for_last=true时为false)
 
-即to_submit的最后一个req或者不用等提交的全做完或者cq已经满足最小完成数，那么block住，避免陷入async_list带来的异步开销,TODO这块其实不明白为什么可以这么设计
+即to_submit的最后一个req或者不用等提交的全做完或者cq已经满足最小完成数，那么block住，避免陷入async_list带来的异步开销,这块其实不明白为什么可以这么设计(还好[119] bc808bced39f回退了这个修改)
 ```
 
 
