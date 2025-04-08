@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Mon, 07 Apr 2025 03:03:25 GMT</pubDate>
-    <lastBuildDate>Mon, 07 Apr 2025 03:03:25 GMT</lastBuildDate>
+    <pubDate>Tue, 08 Apr 2025 11:03:38 GMT</pubDate>
+    <lastBuildDate>Tue, 08 Apr 2025 11:03:38 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3423,19 +3423,33 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [122] 84d55dc5b9e5 - io_uring: Fix corrupted user_data</h2>
 <h2> [121] a1f58ba46f79 - io_uring: correct timeout req sequence when inserting a new entry</h2>
 <h2> [120] ef03681ae8df - io_uring : correct timeout req sequence when waiting timeout</h2>
+<p>超时请求会返回一个cq，所以所有还在timeout_list中的seq都要+1</p>
 <h2> [119] bc808bced39f - io_uring: revert "io_uring: optimize submit_and_wait API"</h2>
+<p>回退[96] c576666863b7和[112] bf7ec93c644c做的优化，因为这个优化不能普遍适用于所有场景</p>
 <h2> [118] 8b07a65ad30e - io_uring: fix logic error in io_timeout</h2>
+<p>修复[116] 5da0fb1ab34c中的逻辑错误</p>
 <h2> [117] 491381ce07ca - io_uring: fix up O_NONBLOCK handling for sockets</h2>
-<h2> [116] 5da0fb1ab34c - io_uring: consider the overflow of sequence for timeout req</h2>
+<div class="language-text line-numbers-mode" data-ext="text"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> [116] 5da0fb1ab34c - io_uring: consider the overflow of sequence for timeout req</h2>
+<p>要结合[118] 8b07a65ad30e一起看，如果计算seq overflow那就会导致timeout_list顺序错乱，因为timeout_list是让最短timeout时间的先结束，所以一定要保序，而drain每个是独立的，也就是先来的req先drain，所以不需要考虑overflow（因为只要比较当前的req是否等于超时的req即可）</p>
+<p>通过复用req-&gt;submit.sequence报错count，这样就可以根据结果seq算回原来的cached_sq_head是多少，再将overflow的加上UINT_MAX就可以当作原本的head值再进行判断</p>
 <h2> [115] 7adf4eaf60f3 - io_uring: fix sequence logic for timeout requests</h2>
+<p>原来defer_list和timeout_list上的req都只是包含timeout信息或者drained信息，但io_sequence_defer会将两个信息都比较，因此拆分开来，只比较当前req拥有的信息</p>
 <h2> [114] 8a9973408177 - io_uring: only flush workqueues on fileset removal</h2>
 <h2> [113] 6805b32ec2b0 - io_uring: remove wait loop spurious wakeups</h2>
+<p>rt</p>
 <h2> [112] bf7ec93c644c - io_uring: fix reversed nonblock flag for link submission</h2>
-<h2> [111] bdf200731145 - io_uring: use __kernel_timespec in timeout ABI</h2>
+<p>修改[96] c576666863b7中的逻辑</p>
+<div class="language-text line-numbers-mode" data-ext="text"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> [111] bdf200731145 - io_uring: use __kernel_timespec in timeout ABI</h2>
+<p>rt</p>
 <h2> [110] bda521624e75 - io_uring: make CQ ring wakeups be more efficient</h2>
+<p>该处理是考虑到ctx-&gt;wait被多次唤醒在批处理IO的情况下，wait_event*()会多次唤醒休眠，因此将wait_event_interruptible拆解回了prepare_to_wait+schedule+finish_wait，在wait_event_interruptible原本绑定的唤醒函数autoremove_wake_function上增加了是否需要被wake_up的判断来减少反复唤醒休眠唤醒</p>
 <h2> [109] daa5de541584 - io_uring: compare cached_cq_tail with cq.head in_io_uring_poll</h2>
 <h2> [108] 32960613b7c3 - io_uring: correctly handle non -&gt;{read,write}_iter() file_operations</h2>
+<p>rt</p>
 <h2> [107] 5262f567987d - io_uring: IORING_OP_TIMEOUT support</h2>
+<p>支持了timeout功能：</p>
+<p>1）支持hrtimer超时回调io_timeout_fn，返回值赋值为-ETIME</p>
+<p>2）支持N events完成超时，类似于DRAIN设置seq在每一次cq时判断timeout_list上之前发下来的req是否已满足N events（timeout_list将所有N events的req都加入到timeout_list中，按照从后向前遍历找到第一个比当前的req的N events小的链表节点后插入）</p>
 <h2> [106] 9831a90ce643 - io_uring: use cond_resched() in sqthread</h2>
 <p>若代码路径可能长时间占用 CPU（如循环处理大量数据），优先使用 cond_resched</p>
 <p>若等待时间极短且需避免任务切换开销（如自旋锁），使用 cpu_relax</p>
