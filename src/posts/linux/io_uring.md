@@ -3285,17 +3285,57 @@ tee io_uring.commit.list
 ## [132] 33a107f0a1b8 - io_uring: allow application controlled CQ ring size
 ## [131] c3a31e605620 - io_uring: add support for IORING_REGISTER_FILES_UPDATE
 ## [130] 08a451739a9b - io_uring: allow sparse fixed file sets
+
+支持稀疏的固定文件集，也就是传入的ctx->user_files有可能其中几个是NULL
+
+
+
 ## [129] ba816ad61fdf - io_uring: run dependent links inline if possible
+
+对link_list的优化，如果当前已经在async_list中，那么就不需要重新queue_work，通过current_work来判断
+
+
+
 ## [128] 044c1ab399af - io_uring: don't touch ctx in setup after ring fd install
 ## [127] 7b20238d28da - io_uring: Fix leaked shadow_req
+
+rt
+
+
+
 ## [126] 2b2ed9750fc9 - io_uring: fix bad inflight accounting for SETUP_IOPOLL|SETUP_SQTHREAD
+
+inflight是正在处理的sq数，nr_events是当前处理完成的sq数，如果一些req被drop了那么inflight就会大于nr_events，导致一直polling，实际上已经执行完成了，因此加入了在poll_list为空情况下直接inflight置为0结束
+
+
+
 ## [125] 498ccd9eda49 - io_uring: used cached copies of sq->dropped and cq->overflow
+
+用内核缓存副本避免恶意用户直接修改ring里面参数
+
+
+
 ## [124] 935d1e45908a - io_uring: Fix race for sqes with userspace
+
+io_commit_sqring会更新rings->sq.head，用户会认为已经处理完在head之前的sqe就可以重写入，但此时如果有link还需要执行io_queue_link_head访问，如果用户重写了就会导致异常因此把io_commit_sqring放到最后
+
+
+
 ## [123] fb5ccc98782f - io_uring: Fix broken links with offloading
+
+详见commit message，取消了在kernel thread下的批量处理，因为link_list需要one by one然后根据前一个req来决定下一个req的处理，批量处理的话就解决不了，因此改为和io_ring_submit一样，同时因此丧失了灵活性等
+
+
+
 ## [122] 84d55dc5b9e5 - io_uring: Fix corrupted user_data
+
+req->user_data只在真正提交时赋值，而在这之前还有fail的路径这样就会导致cq中的req->user_data是错误的，因此提前对req->user_data赋值
+
+
+
 ## [121] a1f58ba46f79 - io_uring: correct timeout req sequence when inserting a new entry
 
-
+TODO没看懂这个span的逻辑
 
 
 
