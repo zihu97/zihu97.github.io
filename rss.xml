@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Tue, 08 Apr 2025 11:03:38 GMT</pubDate>
-    <lastBuildDate>Tue, 08 Apr 2025 11:03:38 GMT</lastBuildDate>
+    <pubDate>Wed, 09 Apr 2025 10:54:25 GMT</pubDate>
+    <lastBuildDate>Wed, 09 Apr 2025 10:54:25 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3414,14 +3414,22 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [131] c3a31e605620 - io_uring: add support for IORING_REGISTER_FILES_UPDATE</h2>
 <h2> [130] 08a451739a9b - io_uring: allow sparse fixed file sets</h2>
 <h2> [129] ba816ad61fdf - io_uring: run dependent links inline if possible</h2>
+<p>对link_list的优化，如果当前已经在async_list中，那么就不需要重新queue_work，通过current_work来判断</p>
 <h2> [128] 044c1ab399af - io_uring: don't touch ctx in setup after ring fd install</h2>
 <h2> [127] 7b20238d28da - io_uring: Fix leaked shadow_req</h2>
+<p>rt</p>
 <h2> [126] 2b2ed9750fc9 - io_uring: fix bad inflight accounting for SETUP_IOPOLL|SETUP_SQTHREAD</h2>
+<p>inflight是正在处理的sq数，nr_events是当前处理完成的sq数，如果一些req被drop了那么inflight就会大于nr_events，导致一直polling，实际上已经执行完成了，因此加入了在poll_list为空情况下直接inflight置为0结束</p>
 <h2> [125] 498ccd9eda49 - io_uring: used cached copies of sq-&gt;dropped and cq-&gt;overflow</h2>
+<p>用内核缓存副本避免恶意用户直接修改ring里面参数</p>
 <h2> [124] 935d1e45908a - io_uring: Fix race for sqes with userspace</h2>
+<p>io_commit_sqring会更新rings-&gt;sq.head，用户会认为已经处理完在head之前的sqe就可以重写入，但此时如果有link还需要执行io_queue_link_head访问，如果用户重写了就会导致异常因此把io_commit_sqring放到最后</p>
 <h2> [123] fb5ccc98782f - io_uring: Fix broken links with offloading</h2>
+<p>详见commit message，取消了在kernel thread下的批量处理，因为link_list需要one by one然后根据前一个req来决定下一个req的处理，批量处理的话就解决不了，因此改为和io_ring_submit一样，同时因此丧失了灵活性等</p>
 <h2> [122] 84d55dc5b9e5 - io_uring: Fix corrupted user_data</h2>
+<p>req-&gt;user_data只在真正提交时赋值，而在这之前还有fail的路径这样就会导致cq中的req-&gt;user_data是错误的，因此提前对req-&gt;user_data赋值</p>
 <h2> [121] a1f58ba46f79 - io_uring: correct timeout req sequence when inserting a new entry</h2>
+<p>TODO没看懂这个span的逻辑</p>
 <h2> [120] ef03681ae8df - io_uring : correct timeout req sequence when waiting timeout</h2>
 <p>超时请求会返回一个cq，所以所有还在timeout_list中的seq都要+1</p>
 <h2> [119] bc808bced39f - io_uring: revert "io_uring: optimize submit_and_wait API"</h2>
