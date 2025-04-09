@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Wed, 09 Apr 2025 10:54:25 GMT</pubDate>
-    <lastBuildDate>Wed, 09 Apr 2025 10:54:25 GMT</lastBuildDate>
+    <pubDate>Wed, 09 Apr 2025 11:04:06 GMT</pubDate>
+    <lastBuildDate>Wed, 09 Apr 2025 11:04:06 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3413,6 +3413,7 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [132] 33a107f0a1b8 - io_uring: allow application controlled CQ ring size</h2>
 <h2> [131] c3a31e605620 - io_uring: add support for IORING_REGISTER_FILES_UPDATE</h2>
 <h2> [130] 08a451739a9b - io_uring: allow sparse fixed file sets</h2>
+<p>支持稀疏的固定文件集，也就是传入的ctx-&gt;user_files有可能其中几个是NULL</p>
 <h2> [129] ba816ad61fdf - io_uring: run dependent links inline if possible</h2>
 <p>对link_list的优化，如果当前已经在async_list中，那么就不需要重新queue_work，通过current_work来判断</p>
 <h2> [128] 044c1ab399af - io_uring: don't touch ctx in setup after ring fd install</h2>
