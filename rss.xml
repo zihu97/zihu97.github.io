@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Wed, 09 Apr 2025 11:04:06 GMT</pubDate>
-    <lastBuildDate>Wed, 09 Apr 2025 11:04:06 GMT</lastBuildDate>
+    <pubDate>Fri, 11 Apr 2025 06:53:09 GMT</pubDate>
+    <lastBuildDate>Fri, 11 Apr 2025 06:53:09 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3396,22 +3396,36 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [149] e9ffa5c2b77e - io_uring: set -EINTR directly when a signal wakes up in io_cqring_wait</h2>
 <h2> [148] 62755e35dfb2 - io_uring: support for generic async request cancel</h2>
 <h2> [147] 6873e0bd6a9c - io_uring: ensure we clear io_kiocb-&gt;result before each issue</h2>
+<p>因为req是kmemcache分配出来的，可能复用，而重新赋值前，会在__io_submit_sqe中的IORING_SETUP_IOPOLL判断是否是否为-EAGAIN，这时候就可能会读取到上次的值</p>
 <h2> [146] 975c99a57096 - io_uring: io_wq_create() returns an error pointer, not NULL</h2>
+<p>rt</p>
 <h2> [145] 842f96124c56 - io_uring: fix race with canceling timeouts</h2>
+<p>修复了：当前在io_timeout_remove中hrtimer_try_to_cancel返回-1说明正在执行回调，只产生了当前的-EBUSY的cq,TODO但是没看懂为什么是判断list_empty(&amp;req-&gt;list)，如果他已经为空了不就说明已经被处理了吗，还需要产生吗</p>
 <h2> [144] 65e19f54d29c - io_uring: support for larger fixed file sets</h2>
+<p>多个文件集就通过划分子表的方式扩充，同时限制每个子表为512项，保证在单页内创建，index组织形式为table_index &lt;&lt; IORING_FILE_TABLE_SHIFT + file_index</p>
 <h2> [143] b7620121dc04 - io_uring: protect fixed file indexing with array_index_nospec()</h2>
 <h2> [142] 17f2fe35d080 - io_uring: add support for IORING_OP_ACCEPT</h2>
+<p>rt</p>
 <h2> [141] fcb323cc53e2 - io_uring: io_uring: add support for async work inheriting files</h2>
+<p>支持io_uring_flush刷新和取消已提交的异步请求，在设置IO_WQ_WORK_NEEDS_FILES下加入ctx-&gt;inflight_list，同时通过判断ring_fd和ring_file是否相等来区分是否在SQPOLL中（只有在非SQPOLL下才支持，因为只在io_ring_submit中赋值）</p>
+<p>链表处于并发修改的中间状态时，list_empty_careful仍能正确判断</p>
 <h2> [140] 561fb04a6a22 - io_uring: replace workqueue usage with io-wq</h2>
 <h2> [139] 771b53d033e8 - io-wq: small threadpool implementation for io_uring</h2>
-<h2> [138] 95a1b3ff9a3e - io_uring: Fix mm_fault with READ/WRITE_FIXED</h2>
+<div class="language-text line-numbers-mode" data-ext="text"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> [138] 95a1b3ff9a3e - io_uring: Fix mm_fault with READ/WRITE_FIXED</h2>
+<p>增加了io_sqe_needs_user的判断，避免在fixed file情况下也grab mm</p>
 <h2> [137] fa4562280889 - io_uring: remove index from sqe_submit</h2>
+<p>rt</p>
 <h2> [136] c826bd7a743f - io_uring: add set of tracing events</h2>
+<p>增加tracepoint，比起dev_dbg在关闭时性能开销更小</p>
 <h2> [135] 11365043e527 - io_uring: add support for canceling timeout requests</h2>
+<p>增加对某个timeout req的cancel req操作，因此在取消时需要同时产生timeout req和cancel req两个的cqe</p>
 <h2> [134] a41525ab2e75 - io_uring: add support for absolute timeouts</h2>
+<p>支持HRTIMER_MODE_ABS（绝对系统时间）和HRTIMER_MODE_REL（相对当前系统时间）两种高精度模式定时器</p>
 <h2> [133] ba5290ccb6b5 - io_uring: replace s-&gt;needs_lock with s-&gt;in_async</h2>
 <h2> [132] 33a107f0a1b8 - io_uring: allow application controlled CQ ring size</h2>
+<p>rt</p>
 <h2> [131] c3a31e605620 - io_uring: add support for IORING_REGISTER_FILES_UPDATE</h2>
+<p>详见commit message，看意思是更新从user_files的up.offset开始的nr_args个fd，新的fd在up.fds，每一次都要取消注册原来的fd以及注册新的fd</p>
 <h2> [130] 08a451739a9b - io_uring: allow sparse fixed file sets</h2>
 <p>支持稀疏的固定文件集，也就是传入的ctx-&gt;user_files有可能其中几个是NULL</p>
 <h2> [129] ba816ad61fdf - io_uring: run dependent links inline if possible</h2>
