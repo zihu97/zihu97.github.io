@@ -3268,22 +3268,104 @@ tee io_uring.commit.list
 ## [149] e9ffa5c2b77e - io_uring: set -EINTR directly when a signal wakes up in io_cqring_wait
 ## [148] 62755e35dfb2 - io_uring: support for generic async request cancel
 ## [147] 6873e0bd6a9c - io_uring: ensure we clear io_kiocb->result before each issue
+
+因为req是kmemcache分配出来的，可能复用，而重新赋值前，会在__io_submit_sqe中的IORING_SETUP_IOPOLL判断是否是否为-EAGAIN，这时候就可能会读取到上次的值
+
+
+
 ## [146] 975c99a57096 - io_uring: io_wq_create() returns an error pointer, not NULL
+
+rt
+
+
+
 ## [145] 842f96124c56 - io_uring: fix race with canceling timeouts
+
+修复了：当前在io_timeout_remove中hrtimer_try_to_cancel返回-1说明正在执行回调，只产生了当前的-EBUSY的cq,TODO但是没看懂为什么是判断list_empty(&req->list)，如果他已经为空了不就说明已经被处理了吗，还需要产生吗
+
+
+
 ## [144] 65e19f54d29c - io_uring: support for larger fixed file sets
+
+多个文件集就通过划分子表的方式扩充，同时限制每个子表为512项，保证在单页内创建，index组织形式为table_index << IORING_FILE_TABLE_SHIFT + file_index
+
+
+
 ## [143] b7620121dc04 - io_uring: protect fixed file indexing with array_index_nospec()
 ## [142] 17f2fe35d080 - io_uring: add support for IORING_OP_ACCEPT
+
+rt
+
+
+
 ## [141] fcb323cc53e2 - io_uring: io_uring: add support for async work inheriting files
+
+支持io_uring_flush刷新和取消已提交的异步请求，在设置IO_WQ_WORK_NEEDS_FILES下加入ctx->inflight_list，同时通过判断ring_fd和ring_file是否相等来区分是否在SQPOLL中（只有在非SQPOLL下才支持，因为只在io_ring_submit中赋值）
+
+链表处于并发修改的中间状态时，list_empty_careful仍能正确判断
+
+
+
 ## [140] 561fb04a6a22 - io_uring: replace workqueue usage with io-wq
 ## [139] 771b53d033e8 - io-wq: small threadpool implementation for io_uring
+
+```
+针对io_uring深度优化的workqueue，包括且不限于如下内容：
+
+用io_wq_enqueue_hashed以文件file为key，保证同一文件串行执行，避免锁争用
+
+在workqueue中支持work取消
+
+将[12] 31b515106428和## [99] 6d5d5ac522b2 页面合并的机制直接融入io-wq
+
+将[98] 54a91f3bb9b9缓冲写的优化也融入io-wq
+```
+
+
+
 ## [138] 95a1b3ff9a3e - io_uring: Fix mm_fault with READ/WRITE_FIXED
+
+增加了io_sqe_needs_user的判断，避免在fixed file情况下也grab mm
+
+
+
 ## [137] fa4562280889 - io_uring: remove index from sqe_submit
+
+rt
+
+
+
 ## [136] c826bd7a743f - io_uring: add set of tracing events
+
+增加tracepoint，比起dev_dbg在关闭时性能开销更小
+
+
+
 ## [135] 11365043e527 - io_uring: add support for canceling timeout requests
+
+增加对某个timeout req的cancel req操作，因此在取消时需要同时产生timeout req和cancel req两个的cqe
+
+
+
 ## [134] a41525ab2e75 - io_uring: add support for absolute timeouts
+
+支持HRTIMER_MODE_ABS（绝对系统时间）和HRTIMER_MODE_REL（相对当前系统时间）两种高精度模式定时器
+
+
+
 ## [133] ba5290ccb6b5 - io_uring: replace s->needs_lock with s->in_async
 ## [132] 33a107f0a1b8 - io_uring: allow application controlled CQ ring size
+
+rt
+
+
+
 ## [131] c3a31e605620 - io_uring: add support for IORING_REGISTER_FILES_UPDATE
+
+详见commit message，看意思是更新从user_files的up.offset开始的nr_args个fd，新的fd在up.fds，每一次都要取消注册原来的fd以及注册新的fd
+
+
+
 ## [130] 08a451739a9b - io_uring: allow sparse fixed file sets
 
 支持稀疏的固定文件集，也就是传入的ctx->user_files有可能其中几个是NULL
