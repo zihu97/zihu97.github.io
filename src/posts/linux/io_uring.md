@@ -3561,10 +3561,39 @@ tee io_uring.commit.list
 ## [180] 960e432dfa59 - io_uring: use correct "is IO worker" helper
 ## [179] 93bd25bb69f4 - io_uring: make timeout sequence == 0 mean no sequence
 ## [178] 76a46e066e2d - io_uring: fix -ENOENT issue with linked timer with short timeout
+
+
+
+
+
 ## [177] 768134d4f481 - io_uring: don't do flush cancel under inflight_lock
+
+rt
+
+
+
 ## [176] c1edbf5f081b - io_uring: flag SQPOLL busy condition to userspace
+
+在IORING_SETUP_SQPOLL中也先判断刷新下overflow_list
+
+当因为overflow_list不为空导致无法继续提交sqe时会返回-EBUSY，此时io_sq_thread会sleep等待用户态处理后通知唤醒
+
+
+
 ## [175] 47f467686ec0 - io_uring: make ASYNC_CANCEL work with poll and timeout
+
+rt，io_poll_remove和io_timeout_remove所支持的cancel功能也放到io_async_cancel中进行支持
+
+
+
 ## [174] 0ddf92e848ab - io_uring: provide fallback request for OOM situations
+
+预分配了一个req用于OOM时可以使用这个预分配的req来继续操作，但是commit message里面说的可以让用户知道等待，没看出来
+
+里面值得注意的点是通过test_and_set_bit_lock来控制ctx->fallback_req的最后一位来判断是否已经被使用
+
+
+
 ## [173] 8e3cca127062 - io_uring: convert accept4() -ERESTARTSYS into -EINTR
 ## [172] 46568e9be70f - io_uring: fix error clear of ->file_table in io_sqe_files_register()
 ## [171] c69f8dbe2426 - io_uring: separate the io_free_req and io_free_req_find_next interface
@@ -3573,12 +3602,41 @@ tee io_uring.commit.list
 ## [168] 206aefde4f88 - io_uring: reduce/pack size of io_ring_ctx
 ## [167] 5f8fd2d3e0a7 - io_uring: properly mark async work as bounded vs unbounded
 ## [166] c5def4ab8494 - io-wq: add support for bounded vs unbunded work
+
+rt
+
+
+
 ## [165] 1d7bb1d50fb4 - io_uring: add support for backlogged CQ ring
+
+io_cqring_overflow_flush 强制刷新（在退出流程和用户主动刷新流程）会将overflow_list清空，不强制刷新则判断（无overflow req和cq刚好满）就退出否则会将overflow_list清空
+
+io_cqring_overflow_flush - io_cqring_events - __io_iopoll_check
+                                            - io_should_wake - io_wake_function
+                                                             - io_cqring_wait
+                                            - io_cqring_wait
+                         - io_submit_sqes
+                         - io_ring_ctx_wait_and_kill（true） - io_uring_release
+                         - io_uring_flush（true）
+
+填充cqe时当cq满了就会先主动填充overflow_list，除非用户强制刷新才会增长cq_overflow
+
+提交sqe时如果overflow_list已经有数据了就会尝试刷新一次overflow_list并返回-EBUSY
+
+
+
 ## [164] 78e19bbef383 - io_uring: pass in io_kiocb to fill/add CQ handlers
 ## [163] 84f97dc2333c - io_uring: make io_cqring_events() take 'ctx' as argument
+
+rt
+
+
+
 ## [162] 2665abfd757f - io_uring: add support for linked SQE timeouts
 
+支持单个sqe(前提是link req)的超时机制，如果是link那么就先按照link逻辑放到link_list上再一个个执行，直到从link_list拿到设置了IORING_OP_LINK_TIMEOUT的req，建立定时器，时间到自动取消，或者在link_list逐步往下执行前发现当前是timeout直接取消，TODO不过看这个代码io_req_link_next中对nxt的判断感觉写错了，不明白为什么判断当前是timeout就把link_list上的所有req都drop掉
 
+io_cqring_add_event=io_cqring_fill_event(填充cqe)+io_commit_cqring(提交cqe)+io_cqring_ev_posted（唤醒wq）
 
 
 
