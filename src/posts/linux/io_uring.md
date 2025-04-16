@@ -3546,26 +3546,62 @@ tee io_uring.commit.list
 ## [195] b0dd8a412699 - io_uring: correct poll cancel and linked timeout expiration completion
 ## [194] e0e328c4b330 - io_uring: remove dead REQ_F_SEQ_PREV flag
 ## [193] 94ae5e77a915 - io_uring: fix sequencing issues with linked timeouts
+
+
+
+
+
 ## [192] ad8a48acc23c - io_uring: make req->timeout be dynamically allocated
 ## [191] 978db57e2c32 - io_uring: make io_double_put_req() use normal completion path
 ## [190] 0e0702dac26b - io_uring: cleanup return values from the queueing functions
 ## [189] 95a5bbae05ef - io_uring: io_async_cancel() should pass in 'nxt' request pointer
+
+rt
+
+
+
 ## [188] eac406c61cd0 - io_uring: make POLL_ADD/POLL_REMOVE scale better
+
+io_poll_cancel中需要找到取消的req，之前用的链表，全遍历是O(n)，现在改成红黑树，复杂度是O(logn)
+
+
+
 ## [187] a320e9fa1e26 - io_uring: Fix getting file for non-fd opcodes
 ## [186] 9d858b214839 - io_uring: introduce req_need_defer()
 ## [185] 2f6d9b9d6357 - io_uring: clean up io_uring_cancel_files()
 ## [184] 5e559561a8d7 - io_uring: ensure registered buffer import returns the IO length
 ## [183] 5683e5406e94 - io_uring: Fix getting file for timeout
 ## [182] 15dff286d0e0 - io_uring: check for validity of ->rings in teardown
+
+rt
+
+
+
 ## [181] 7c9e7f0fe0d8 - io_uring: fix potential deadlock in io_poll_wake()
+
+TODO这里潜在的死锁没看出来
+
+io_queue_linked_timeout <- __io_queue_sqe
+
+io_timeout <- __io_submit_sqe(IORING_OP_TIMEOUT，最终提交给HW) <- io_wq_submit_work
+                                                             <- __io_queue_sqe <- io_queue_sqe <- io_queue_link_head（比）
+                                                                                               <- io_submit_sqe(普通req提交) <- io_submit_sqes
+                                                                               <- io_queue_link_head <- io_submit_sqes <- io_sq_thread
+                                                                                                           <- !IORING_SETUP_SQPOLL
+
+1) __io_submit_sqe 提交给HW
+2) __io_queue_sqe  2-1) 将__io_submit_sqe不能立马完成的提交给wq，即io_wq_submit_work
+                   2-2) 如果当前是link req，下一个link req是link_timeout，那么把当前的置为link_timeout,当前的req没做完放到wq之后就打开定时器
+3) io_queue_link_head 这是一定要提交的，如果是link+drain组合的就添加1个shadow req到defer_list,如果defer_list没做完就等待其他流程进入4流程，如果defer_list做完了就直接走入2
+4) io_queue_sqe    如果是drain req就放到defer_list，否则就正常走入2
+5) io_submit_sqe   是link就搭建link_list等待3提交，不是link直接进入4提交
+6) io_submit_sqes  根据每个sqe，判断选择进入3还是5
+
+
+
 ## [180] 960e432dfa59 - io_uring: use correct "is IO worker" helper
 ## [179] 93bd25bb69f4 - io_uring: make timeout sequence == 0 mean no sequence
 ## [178] 76a46e066e2d - io_uring: fix -ENOENT issue with linked timer with short timeout
-
-
-
-
-
 ## [177] 768134d4f481 - io_uring: don't do flush cancel under inflight_lock
 
 rt
