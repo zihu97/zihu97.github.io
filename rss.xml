@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Wed, 16 Apr 2025 10:06:29 GMT</pubDate>
-    <lastBuildDate>Wed, 16 Apr 2025 10:06:29 GMT</lastBuildDate>
+    <pubDate>Thu, 17 Apr 2025 10:15:35 GMT</pubDate>
+    <lastBuildDate>Thu, 17 Apr 2025 10:15:35 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3657,20 +3657,41 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [208] d732447fed7d - io_uring: rename __io_submit_sqe()</h2>
 <h2> [207] 915967f69c59 - io_uring: improve trace_io_uring_defer() trace point</h2>
 <h2> [206] 1b4a51b6d03d - io_uring: drain next sqe instead of shadowing</h2>
+<p>如[95] 4fe2c963154c中添加的drain|link通过增加一个shadow req来解决，就是把shadow置为drain，保证link的在一批次内完成,现在改为了直接将下一个req置为drain不需要增加shadow req，通过drain_next只修改drain|link的下一个req为drain</p>
 <h2> [205] b76da70fc375 - io_uring: close lookup gap for dependent next work</h2>
+<p>TODO如果这样做的话，那不是应该所有的都需要做一个callback吗，保证只有work真正开始做的时候才能打开定时器，但看代码并不是所有情况都这样做了</p>
 <h2> [204] 4d7dd4629714 - io_uring: allow finding next link independent of req reference count</h2>
+<p>简单来看原来是可以只有req可以free了再找下一个改为在io_put_req_find_next中直接找下一个，如果是req引用计数到0再走当前req的free流程</p>
 <h2> [203] eb065d301e8c - io_uring: io_allocate_scq_urings() should return a sane state</h2>
+<p>rt</p>
 <h2> [202] bbad27b2f622 - io_uring: Always REQ_F_FREE_SQE for allocated sqe</h2>
+<p>统一将sqe_copy置为REQ_F_FREE_SQE，在__io_free_req中判断free</p>
 <h2> [201] 5d960724b0cb - io_uring: io_fail_links() should only consider first linked timeout</h2>
+<p>在第一次判断是REQ_F_LINK_TIMEOUT，处理后就把REQ_F_LINK_TIMEOUT清掉，这样之后的req就不会判断REQ_F_LINK_TIMEOUT成功进行cancel，因为他们根本还没有开始</p>
 <h2> [200] 09fbb0a83ec6 - io_uring: Fix leaking linked timeouts</h2>
+<p>如果是timeout req就设置REQ_F_TIMEOUT</p>
+<p>如果当前是link req，其后跟了一个link timeout req用来监督该link是否超时，就会设置REQ_F_LINK_TIMEOUT</p>
+<p>就是有两个任务，link + link timeout，那么在放到link_list的时候，第二个就会置为REQ_F_TIMEOUT，然后等到开始执行link_list上内容，即第1个link时，发现第二个是link timeout那么就会给当前的即第一个link置为REQ_F_LINK_TIMEOUT</p>
+
+<p>这里的场景就是link + link timeout + link timeout，正在处理第二个link req</p>
+
+<p>这里的场景就是link + link timeout + link timeout，正在处理第二个link req,和上面场景一样</p>
 <h2> [199] f70193d6d8ca - io_uring: remove redundant check</h2>
 <h2> [198] d3b35796b1e3 - io_uring: break links for failed defer</h2>
 <h2> [197] b60fda6000a9 - io-wq: wait for io_wq_create() to setup necessary workers</h2>
 <h2> [196] fba38c272a03 - io_uring: request cancellations should break links</h2>
+<p>rt</p>
 <h2> [195] b0dd8a412699 - io_uring: correct poll cancel and linked timeout expiration completion</h2>
+<p>原先在cancel情况下也会继续poll,现在判断是cancel主动返回-ECANCELED</p>
 <h2> [194] e0e328c4b330 - io_uring: remove dead REQ_F_SEQ_PREV flag</h2>
+<p>rt</p>
 <h2> [193] 94ae5e77a915 - io_uring: fix sequencing issues with linked timeouts</h2>
-<h2> [192] ad8a48acc23c - io_uring: make req-&gt;timeout be dynamically allocated</h2>
+<p>io_timeout_setup从io_prep_linked_timeout移动到了io_submit_sqe，主要是为了适配io_queue_linked_timeout在多处地方的增加，因此提交了定时器的初始化</p>
+<p>io_prep_linked_timeout 1）当前是link下一个是link_timeout的，返回link_timeout的req</p>
+<p>io_prep_async_work 1）选择对应的workqueue(UNBOUND/BOUND) 2）返回io_prep_linked_timeout得到的link_timeout的req
+需要考虑的场景：1）io_queue_async_work 2）__io_queue_sqe</p>
+<p>io_queue_linked_timeout 打开定时器</p>
+<div class="language-text line-numbers-mode" data-ext="text"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> [192] ad8a48acc23c - io_uring: make req-&gt;timeout be dynamically allocated</h2>
 <h2> [191] 978db57e2c32 - io_uring: make io_double_put_req() use normal completion path</h2>
 <h2> [190] 0e0702dac26b - io_uring: cleanup return values from the queueing functions</h2>
 <h2> [189] 95a5bbae05ef - io_uring: io_async_cancel() should pass in 'nxt' request pointer</h2>
@@ -3685,7 +3706,6 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [182] 15dff286d0e0 - io_uring: check for validity of -&gt;rings in teardown</h2>
 <p>rt</p>
 <h2> [181] 7c9e7f0fe0d8 - io_uring: fix potential deadlock in io_poll_wake()</h2>
-<p>TODO这里潜在的死锁没看出来</p>
 <p>io_queue_linked_timeout &lt;- __io_queue_sqe</p>
 <p>io_timeout &lt;- __io_submit_sqe(IORING_OP_TIMEOUT，最终提交给HW) &lt;- io_wq_submit_work
 &lt;- __io_queue_sqe &lt;- io_queue_sqe &lt;- io_queue_link_head（比）
@@ -3693,8 +3713,8 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 &lt;- io_queue_link_head &lt;- io_submit_sqes &lt;- io_sq_thread
 &lt;- !IORING_SETUP_SQPOLL</p>
 <ol>
-<li>__io_submit_sqe 提交给HW</li>
-<li>__io_queue_sqe  2-1) 将__io_submit_sqe不能立马完成的提交给wq，即io_wq_submit_work
+<li>__io_submit_sqe 同步，提交给HW</li>
+<li>__io_queue_sqe  同步+异步 2-1) 将__io_submit_sqe不能立马完成的提交给wq，即io_wq_submit_work
 2-2) 如果当前是link req，下一个link req是link_timeout，那么把当前的置为link_timeout,当前的req没做完放到wq之后就打开定时器</li>
 <li>io_queue_link_head 这是一定要提交的，如果是link+drain组合的就添加1个shadow req到defer_list,如果defer_list没做完就等待其他流程进入4流程，如果defer_list做完了就直接走入2</li>
 <li>io_queue_sqe    如果是drain req就放到defer_list，否则就正常走入2</li>
@@ -3738,7 +3758,7 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [163] 84f97dc2333c - io_uring: make io_cqring_events() take 'ctx' as argument</h2>
 <p>rt</p>
 <h2> [162] 2665abfd757f - io_uring: add support for linked SQE timeouts</h2>
-<p>支持单个sqe(前提是link req)的超时机制，如果是link那么就先按照link逻辑放到link_list上再一个个执行，直到从link_list拿到设置了IORING_OP_LINK_TIMEOUT的req，建立定时器，时间到自动取消，或者在link_list逐步往下执行前发现当前是timeout直接取消，TODO不过看这个代码io_req_link_next中对nxt的判断感觉写错了，不明白为什么判断当前是timeout就把link_list上的所有req都drop掉</p>
+<p>支持单个sqe(前提是link req)的超时机制，如果是link那么就先按照link逻辑放到link_list上再一个个执行，直到从link_list拿到设置了IORING_OP_LINK_TIMEOUT的req，建立定时器，时间到自动取消，或者在link_list逐步往下执行前发现当前是timeout直接取消，这里可以看[200] 09fbb0a83ec6这里关于REQ_F_LINK_TIMEOUT的解释，所以如果当前是REQ_F_LINK_TIMEOUT，那么下一个就是link的timeout req，因为已经处理了，所以需要drop掉，而且因为通过list_splice将req链表转移到了nxt上，所以下一次获取到的nxt就是NULL不需要break</p>
 <p>io_cqring_add_event=io_cqring_fill_event(填充cqe)+io_commit_cqring(提交cqe)+io_cqring_ev_posted（唤醒wq）</p>
 <h2> [161] e977d6d34f0c - io_uring: abstract out io_async_cancel_one() helper</h2>
 <h2> [160] 267bc90442aa - io_uring: use inlined struct sqe_submit</h2>
@@ -3768,7 +3788,7 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [146] 975c99a57096 - io_uring: io_wq_create() returns an error pointer, not NULL</h2>
 <p>rt</p>
 <h2> [145] 842f96124c56 - io_uring: fix race with canceling timeouts</h2>
-<p>修复了：当前在io_timeout_remove中hrtimer_try_to_cancel返回-1说明正在执行回调，只产生了当前的-EBUSY的cq,TODO但是没看懂为什么是判断list_empty(&amp;req-&gt;list)，如果他已经为空了不就说明已经被处理了吗，还需要产生吗</p>
+<p>修复了：当前在io_timeout_remove中hrtimer_try_to_cancel返回-1说明正在执行回调，只产生了当前的-EBUSY的cq,就是把timeout所有的完成全部放到超时回调函数中，list_empty(&amp;req-&gt;list)只用来处理seq的情况</p>
 <h2> [144] 65e19f54d29c - io_uring: support for larger fixed file sets</h2>
 <p>多个文件集就通过划分子表的方式扩充，同时限制每个子表为512项，保证在单页内创建，index组织形式为table_index &lt;&lt; IORING_FILE_TABLE_SHIFT + file_index</p>
 <h2> [143] b7620121dc04 - io_uring: protect fixed file indexing with array_index_nospec()</h2>
@@ -3779,7 +3799,7 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <p>链表处于并发修改的中间状态时，list_empty_careful仍能正确判断</p>
 <h2> [140] 561fb04a6a22 - io_uring: replace workqueue usage with io-wq</h2>
 <h2> [139] 771b53d033e8 - io-wq: small threadpool implementation for io_uring</h2>
-<div class="language-text line-numbers-mode" data-ext="text"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> [138] 95a1b3ff9a3e - io_uring: Fix mm_fault with READ/WRITE_FIXED</h2>
+<div class="language-text line-numbers-mode" data-ext="text"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> [138] 95a1b3ff9a3e - io_uring: Fix mm_fault with READ/WRITE_FIXED</h2>
 <p>增加了io_sqe_needs_user的判断，避免在fixed file情况下也grab mm</p>
 <h2> [137] fa4562280889 - io_uring: remove index from sqe_submit</h2>
 <p>rt</p>
