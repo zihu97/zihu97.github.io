@@ -3533,21 +3533,102 @@ tee io_uring.commit.list
 ## [208] d732447fed7d - io_uring: rename __io_submit_sqe()
 ## [207] 915967f69c59 - io_uring: improve trace_io_uring_defer() trace point
 ## [206] 1b4a51b6d03d - io_uring: drain next sqe instead of shadowing
+
+如[95] 4fe2c963154c中添加的drain|link通过增加一个shadow req来解决，就是把shadow置为drain，保证link的在一批次内完成,现在改为了直接将下一个req置为drain不需要增加shadow req，通过drain_next只修改drain|link的下一个req为drain
+
+
+
 ## [205] b76da70fc375 - io_uring: close lookup gap for dependent next work
+
+TODO如果这样做的话，那不是应该所有的都需要做一个callback吗，保证只有work真正开始做的时候才能打开定时器，但看代码并不是所有情况都这样做了
+
+
+
 ## [204] 4d7dd4629714 - io_uring: allow finding next link independent of req reference count
+
+简单来看原来是可以只有req可以free了再找下一个改为在io_put_req_find_next中直接找下一个，如果是req引用计数到0再走当前req的free流程
+
+
+
 ## [203] eb065d301e8c - io_uring: io_allocate_scq_urings() should return a sane state
+
+rt
+
+
+
 ## [202] bbad27b2f622 - io_uring: Always REQ_F_FREE_SQE for allocated sqe
+
+统一将sqe_copy置为REQ_F_FREE_SQE，在__io_free_req中判断free
+
+
+
 ## [201] 5d960724b0cb - io_uring: io_fail_links() should only consider first linked timeout
+
+在第一次判断是REQ_F_LINK_TIMEOUT，处理后就把REQ_F_LINK_TIMEOUT清掉，这样之后的req就不会判断REQ_F_LINK_TIMEOUT成功进行cancel，因为他们根本还没有开始
+
+
+
 ## [200] 09fbb0a83ec6 - io_uring: Fix leaking linked timeouts
+
+如果是timeout req就设置REQ_F_TIMEOUT
+
+如果当前是link req，其后跟了一个link timeout req用来监督该link是否超时，就会设置REQ_F_LINK_TIMEOUT
+
+就是有两个任务，link + link timeout，那么在放到link_list的时候，第二个就会置为REQ_F_TIMEOUT，然后等到开始执行link_list上内容，即第1个link时，发现第二个是link timeout那么就会给当前的即第一个link置为REQ_F_LINK_TIMEOUT
+
+		if ((req->flags & REQ_F_LINK_TIMEOUT) &&
+		    (nxt->flags & REQ_F_TIMEOUT)) {
+这里的场景就是link + link timeout + link timeout，正在处理第二个link req
+
+		if ((req->flags & REQ_F_LINK_TIMEOUT) &&
+		    link->submit.sqe->opcode == IORING_OP_LINK_TIMEOUT) {
+这里的场景就是link + link timeout + link timeout，正在处理第二个link req,和上面场景一样
+
+
+
 ## [199] f70193d6d8ca - io_uring: remove redundant check
 ## [198] d3b35796b1e3 - io_uring: break links for failed defer
 ## [197] b60fda6000a9 - io-wq: wait for io_wq_create() to setup necessary workers
 ## [196] fba38c272a03 - io_uring: request cancellations should break links
+
+rt
+
+
+
 ## [195] b0dd8a412699 - io_uring: correct poll cancel and linked timeout expiration completion
+
+原先在cancel情况下也会继续poll,现在判断是cancel主动返回-ECANCELED
+
+
+
 ## [194] e0e328c4b330 - io_uring: remove dead REQ_F_SEQ_PREV flag
+
+rt
+
+
+
 ## [193] 94ae5e77a915 - io_uring: fix sequencing issues with linked timeouts
 
+io_timeout_setup从io_prep_linked_timeout移动到了io_submit_sqe，主要是为了适配io_queue_linked_timeout在多处地方的增加，因此提交了定时器的初始化
 
+io_prep_linked_timeout 1）当前是link下一个是link_timeout的，返回link_timeout的req
+
+io_prep_async_work 1）选择对应的workqueue(UNBOUND/BOUND) 2）返回io_prep_linked_timeout得到的link_timeout的req
+                    需要考虑的场景：1）io_queue_async_work 2）__io_queue_sqe
+
+io_queue_linked_timeout 打开定时器
+
+```
+io_queue_linked_timeout                          - __io_queue_sqe
+
+--->
+
+io_prep_async_work + io_queue_linked_timeout     - io_queue_async_work(异步wq)
+                                                 - io_wq_submit_work(link_list上的next，还在异步wq中)
+io_prep_linked_timeout + io_queue_linked_timeout - __io_queue_sqe
+
+看起来代码的意思应该是说原来只处理link_list上第一个req，之后的link req会直接走__io_submit_sqe，不会触发定时器，现在是每一个req都会判断一次是否link_timeout然后选择触发定时器
+```
 
 
 
@@ -3579,8 +3660,6 @@ rt
 
 ## [181] 7c9e7f0fe0d8 - io_uring: fix potential deadlock in io_poll_wake()
 
-TODO这里潜在的死锁没看出来
-
 io_queue_linked_timeout <- __io_queue_sqe
 
 io_timeout <- __io_submit_sqe(IORING_OP_TIMEOUT，最终提交给HW) <- io_wq_submit_work
@@ -3589,9 +3668,9 @@ io_timeout <- __io_submit_sqe(IORING_OP_TIMEOUT，最终提交给HW) <- io_wq_su
                                                                                <- io_queue_link_head <- io_submit_sqes <- io_sq_thread
                                                                                                            <- !IORING_SETUP_SQPOLL
 
-1) __io_submit_sqe 提交给HW
-2) __io_queue_sqe  2-1) 将__io_submit_sqe不能立马完成的提交给wq，即io_wq_submit_work
-                   2-2) 如果当前是link req，下一个link req是link_timeout，那么把当前的置为link_timeout,当前的req没做完放到wq之后就打开定时器
+1) __io_submit_sqe 同步，提交给HW
+2) __io_queue_sqe  同步+异步 2-1) 将__io_submit_sqe不能立马完成的提交给wq，即io_wq_submit_work
+                            2-2) 如果当前是link req，下一个link req是link_timeout，那么把当前的置为link_timeout,当前的req没做完放到wq之后就打开定时器
 3) io_queue_link_head 这是一定要提交的，如果是link+drain组合的就添加1个shadow req到defer_list,如果defer_list没做完就等待其他流程进入4流程，如果defer_list做完了就直接走入2
 4) io_queue_sqe    如果是drain req就放到defer_list，否则就正常走入2
 5) io_submit_sqe   是link就搭建link_list等待3提交，不是link直接进入4提交
@@ -3670,7 +3749,7 @@ rt
 
 ## [162] 2665abfd757f - io_uring: add support for linked SQE timeouts
 
-支持单个sqe(前提是link req)的超时机制，如果是link那么就先按照link逻辑放到link_list上再一个个执行，直到从link_list拿到设置了IORING_OP_LINK_TIMEOUT的req，建立定时器，时间到自动取消，或者在link_list逐步往下执行前发现当前是timeout直接取消，TODO不过看这个代码io_req_link_next中对nxt的判断感觉写错了，不明白为什么判断当前是timeout就把link_list上的所有req都drop掉
+支持单个sqe(前提是link req)的超时机制，如果是link那么就先按照link逻辑放到link_list上再一个个执行，直到从link_list拿到设置了IORING_OP_LINK_TIMEOUT的req，建立定时器，时间到自动取消，或者在link_list逐步往下执行前发现当前是timeout直接取消，这里可以看[200] 09fbb0a83ec6这里关于REQ_F_LINK_TIMEOUT的解释，所以如果当前是REQ_F_LINK_TIMEOUT，那么下一个就是link的timeout req，因为已经处理了，所以需要drop掉，而且因为通过list_splice将req链表转移到了nxt上，所以下一次获取到的nxt就是NULL不需要break
 
 io_cqring_add_event=io_cqring_fill_event(填充cqe)+io_commit_cqring(提交cqe)+io_cqring_ev_posted（唤醒wq）
 
@@ -3749,7 +3828,7 @@ rt
 
 ## [145] 842f96124c56 - io_uring: fix race with canceling timeouts
 
-修复了：当前在io_timeout_remove中hrtimer_try_to_cancel返回-1说明正在执行回调，只产生了当前的-EBUSY的cq,TODO但是没看懂为什么是判断list_empty(&req->list)，如果他已经为空了不就说明已经被处理了吗，还需要产生吗
+修复了：当前在io_timeout_remove中hrtimer_try_to_cancel返回-1说明正在执行回调，只产生了当前的-EBUSY的cq,就是把timeout所有的完成全部放到超时回调函数中，list_empty(&req->list)只用来处理seq的情况
 
 
 
@@ -3784,7 +3863,6 @@ rt
 
 在workqueue中支持work取消
 
-# TODO但下面两个代码在io-wq.c哪里不清楚
 将[12] 31b515106428和## [99] 6d5d5ac522b2 页面合并的机制直接融入io-wq
 
 将[98] 54a91f3bb9b9缓冲写的优化也融入io-wq
