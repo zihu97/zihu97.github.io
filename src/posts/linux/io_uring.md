@@ -3507,12 +3507,33 @@ tee io_uring.commit.list
 ## [234] f499a021ea8c - io_uring: ensure async punted connect requests copy data
 ## [233] 03b1230ca12a - io_uring: ensure async punted sendmsg/recvmsg requests copy data
 ## [232] f67676d160c6 - io_uring: ensure async punted read/write requests copy iovec
+
 ## [231] 1a6b74fc8702 - io_uring: add general async offload context
+
+去掉REQ_F_FREE_SQE用req->io代替，包括3种场景：1）defer_list 2）async context 3）link_list上除头节点的节点
+
+
+
 ## [230] 441cdbd5449b - io_uring: transform send/recvmsg() -ERESTARTSYS to -EINTR
 ## [229] 0b8c0ec7eedc - io_uring: use current task creds instead of allocating a new one
 ## [228] aa4c3967756c - io_uring: fix missing kmap() declaration on powerpc
+
+rt
+
+
+
 ## [227] 6c5c240e4126 - io_uring: add mapping support for NOMMU archs
+
+为了支持像uClinux这样的nommu的为MCU设计的轻量级linux
+
+
+
 ## [226] e944475e6984 - io_uring: make poll->wait dynamically allocated
+
+静态内存变为动态分配使得结构体在n个cachelines内，可以减少cache miss
+
+
+
 ## [225] 6206f0e180d4 - io-wq: shrink io_wq_work a bit
 ## [224] ad6e005ca68d - io_uring: use kzalloc instead of kcalloc for single-element allocations
 ## [223] 7d009165550a - io_uring: cleanup io_import_fixed()
@@ -3521,17 +3542,71 @@ tee io_uring.commit.list
 ## [220] d69e07793f89 - net: disallow ancillary data for __sys_{send,recv}msg_file()
 ## [219] 4257c8ca13b0 - net: separate out the msghdr copy from ___sys_{send,recv}msg()
 ## [218] 8042d6ce8c40 - io_uring: remove superfluous check for sqe->off in io_accept()
+
+rt
+
+
+
 ## [217] 181e448d8709 - io_uring: async workers should inherit the user creds
+
+继承创建uring时的凭证creds
+
+
+
 ## [216] 311ae9e159d8 - io_uring: fix dead-hung for non-iter fixed rw
+
+rt
+
+
+
 ## [215] f8e85cf255ad - io_uring: add support for IORING_OP_CONNECT
+
+增加IORING_OP_CONNECT，看起来很多都可以用io_uring，先尝试non-blocking,不行就放到async context里
+
+
+
 ## [214] c4a2ed72c9a6 - io_uring: only return -EBUSY for submit on non-flushed backlog
+
+就是把逻辑改的更合理，只有overflow的req不能完全flush也就是cq还是满的无法产生新的cqe的时候返回-EBUS，之前是只要当前overflow_list非空就直接返回-EBUSY，忽略了cq空到可以flush overflow_list的情况
+
+TODO如果在io_cqring_overflow_flush中list_empty_careful非空，而list_empty空了就还是会返回-EBUSY，感觉不合理，会有这种情况吗
+
+
+
 ## [213] f9bd67f69af5 - io_uring: only !null ptr to io_issue_sqe()
+
+原先__io_queue_sqe中的io_issue_sqe不传入nxt，那么就会出现在io_put_req_find_next中如果找到nxt会自己queue_work，现在逻辑统一传入nxt在io_issue_sqe判断nxt就queue_work
+
+通过__attribute__((nonnull))加入编译器检查保证非空
+
+
+
 ## [212] b18fdf71e01f - io_uring: simplify io_req_link_next()
 ## [211] 944e58bfeda0 - io_uring: pass only !null to io_req_find_next()
 ## [210] 70cf9f3270a5 - io_uring: remove io_free_req_find_next()
+
+rt
+
+
+
 ## [209] 9835d6fafba5 - io_uring: add likely/unlikely in io_get_sqring()
+
+通过likely/unlikely提示编译器优化分支预测
+
+
+
 ## [208] d732447fed7d - io_uring: rename __io_submit_sqe()
+
+__io_submit_sqe重命名为io_issue_sqe
+
+
+
 ## [207] 915967f69c59 - io_uring: improve trace_io_uring_defer() trace point
+
+rt
+
+
+
 ## [206] 1b4a51b6d03d - io_uring: drain next sqe instead of shadowing
 
 如[95] 4fe2c963154c中添加的drain|link通过增加一个shadow req来解决，就是把shadow置为drain，保证link的在一批次内完成,现在改为了直接将下一个req置为drain不需要增加shadow req，通过drain_next只修改drain|link的下一个req为drain
