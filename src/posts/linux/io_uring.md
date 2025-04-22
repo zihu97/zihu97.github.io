@@ -3480,12 +3480,35 @@ tee io_uring.commit.list
 ## [261] 0969e783e3a8 - io_uring: make IORING_POLL_ADD and IORING_POLL_REMOVE deferrable
 ## [260] ffbb8d6b7691 - io_uring: make HARDLINK imply LINK
 ## [259] 8ed8d3c3bc32 - io_uring: any deferred command must have stable sqe data
+
 ## [258] fc4df999e24f - io_uring: remove 'sqe' parameter to the OP helpers that take it
+
+rt
+
+
+
 ## [257] b7bb4f7da0a1 - io_uring: fix pre-prepped issue with force_nonblock == true
+
+用io_alloc_async_ctx直接分配req->io代替先用io=kmalloc+req->io=io
+
+同时先检查req->io如果已经分配了就不重新分配一个新的
+
+
+
 ## [256] c58c1f83436b - block: end bio with BLK_STS_AGAIN in case of non-mq devs and REQ_NOWAIT
 ## [255] 0b416c3e1345 - io_uring: fix sporadic -EFAULT from IORING_OP_RECVMSG
 ## [254] d195a66e367b - io_uring: fix stale comment and a few typos
+
+rt
+
+
+
 ## [253] 9e3aa61ae3e0 - io_uring: ensure we return -EINVAL on unknown opcode
+
+仅支持IORING_OP_LAST以内的opcode
+
+
+
 ## [252] 10d59345578a - io_uring: add sockets to list of files that support non-blocking issue
 ## [251] ebfcd8955c0b - net: make socket read/write_iter() honor IOCB_NOWAIT
 ## [250] 53108d476a10 - io_uring: only hash regular files for async work execution
@@ -3493,7 +3516,16 @@ tee io_uring.commit.list
 ## [248] 392edb45b243 - io_uring: don't dynamically allocate poll data
 ## [247] d96885658d99 - io_uring: deferred send/recvmsg should assign iov
 ## [246] 8a4955ff1cca - io_uring: sqthread should grab ctx->uring_lock for submissions
+
+rt
+
+
+
 ## [245] 4e88d6e7793f - io_uring: allow unbreakable links
+
+增加IOSQE_IO_HARDLINK，如果是hardlink那就只有提交sqe失败才算失败，如果中间某个req异常返回依旧正常执行
+
+
 
 ## [244] 0b4295b5e2b9 - io_uring: fix a typo in a comment
 
