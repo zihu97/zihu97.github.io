@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Tue, 22 Apr 2025 03:07:53 GMT</pubDate>
-    <lastBuildDate>Tue, 22 Apr 2025 03:07:53 GMT</lastBuildDate>
+    <pubDate>Tue, 22 Apr 2025 09:07:47 GMT</pubDate>
+    <lastBuildDate>Tue, 22 Apr 2025 09:07:47 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3605,11 +3605,16 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [260] ffbb8d6b7691 - io_uring: make HARDLINK imply LINK</h2>
 <h2> [259] 8ed8d3c3bc32 - io_uring: any deferred command must have stable sqe data</h2>
 <h2> [258] fc4df999e24f - io_uring: remove 'sqe' parameter to the OP helpers that take it</h2>
+<p>rt</p>
 <h2> [257] b7bb4f7da0a1 - io_uring: fix pre-prepped issue with force_nonblock == true</h2>
+<p>用io_alloc_async_ctx直接分配req-&gt;io代替先用io=kmalloc+req-&gt;io=io</p>
+<p>同时先检查req-&gt;io如果已经分配了就不重新分配一个新的</p>
 <h2> [256] c58c1f83436b - block: end bio with BLK_STS_AGAIN in case of non-mq devs and REQ_NOWAIT</h2>
 <h2> [255] 0b416c3e1345 - io_uring: fix sporadic -EFAULT from IORING_OP_RECVMSG</h2>
 <h2> [254] d195a66e367b - io_uring: fix stale comment and a few typos</h2>
+<p>rt</p>
 <h2> [253] 9e3aa61ae3e0 - io_uring: ensure we return -EINVAL on unknown opcode</h2>
+<p>仅支持IORING_OP_LAST以内的opcode</p>
 <h2> [252] 10d59345578a - io_uring: add sockets to list of files that support non-blocking issue</h2>
 <h2> [251] ebfcd8955c0b - net: make socket read/write_iter() honor IOCB_NOWAIT</h2>
 <h2> [250] 53108d476a10 - io_uring: only hash regular files for async work execution</h2>
@@ -3617,7 +3622,9 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [248] 392edb45b243 - io_uring: don't dynamically allocate poll data</h2>
 <h2> [247] d96885658d99 - io_uring: deferred send/recvmsg should assign iov</h2>
 <h2> [246] 8a4955ff1cca - io_uring: sqthread should grab ctx-&gt;uring_lock for submissions</h2>
+<p>rt</p>
 <h2> [245] 4e88d6e7793f - io_uring: allow unbreakable links</h2>
+<p>增加IOSQE_IO_HARDLINK，如果是hardlink那就只有提交sqe失败才算失败，如果中间某个req异常返回依旧正常执行</p>
 <h2> [244] 0b4295b5e2b9 - io_uring: fix a typo in a comment</h2>
 <p>rt</p>
 <h2> [243] 4493233edcfc - io_uring: hook all linked requests via link_list</h2>
