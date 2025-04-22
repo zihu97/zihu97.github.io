@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Mon, 21 Apr 2025 02:09:17 GMT</pubDate>
-    <lastBuildDate>Mon, 21 Apr 2025 02:09:17 GMT</lastBuildDate>
+    <pubDate>Tue, 22 Apr 2025 03:07:53 GMT</pubDate>
+    <lastBuildDate>Tue, 22 Apr 2025 03:07:53 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3619,18 +3619,38 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [246] 8a4955ff1cca - io_uring: sqthread should grab ctx-&gt;uring_lock for submissions</h2>
 <h2> [245] 4e88d6e7793f - io_uring: allow unbreakable links</h2>
 <h2> [244] 0b4295b5e2b9 - io_uring: fix a typo in a comment</h2>
+<p>rt</p>
 <h2> [243] 4493233edcfc - io_uring: hook all linked requests via link_list</h2>
+<p>req-&gt;list</p>
+<blockquote>
+<p>io_cqring_fill_event 如果cq满了，且不强制flush就添加到ctx-&gt;cq_overflow_list
+io_iopoll_req_issued IORING_SETUP_IOPOLL的情况下加入ctx-&gt;poll_list
+io_timeout           有超时需求的就放到ctx-&gt;timeout_list
+io_req_defer         如果是drain的req，就加入ctx-&gt;defer_list
+io_submit_sqe        link req非首节点就放到req-&gt;link_list</p>
+</blockquote>
+<p>req-&gt;link_list</p>
+<blockquote>
+<p>io_submit_sqe        link req首节点就初始化，剩下的就放到首节点的link_list上，之后做完一个把做完的req-&gt;link_list给nxt-&gt;link_list</p>
+</blockquote>
+<p>原先都是用req-&gt;list通过io_submit_sqe的方式区分首节点，然后再通过io_req_link_next将link_list之后的节点转接到nxt上，现在改为直接用每个req-&gt;link_list来进行拼接，也就是说，每个req-&gt;link_list都可以作为一个链表的头节点，那么做完当前的link req之后只要删除当前req的节点即可，不需要再list_splice</p>
 <h2> [242] 2e6e1fde32d7 - io_uring: fix error handling in io_queue_link_head</h2>
+<p>rt</p>
 <h2> [241] 78076bb64aa8 - io_uring: use hash table for poll command lookups</h2>
+<p>使用哈希表代替红黑树，减少查询时间，原来修改是[188] eac406c61cd0</p>
 <h2> [240] 2d28390aff87 - io_uring: ensure deferred timeouts copy necessary data</h2>
+<p>将timeout也放入io_req_defer_prep的管理</p>
 <h2> [239] 901e59bba9dd - io_uring: allow IO_SQE_* flags on IORING_OP_TIMEOUT</h2>
 <h2> [238] 87f80d623c6c - io_uring: handle connect -EINPROGRESS like -EAGAIN</h2>
 <h2> [237] 8cdda87a4414 - io_uring: remove io_wq_current_is_worker</h2>
 <h2> [236] 22efde599865 - io_uring: remove parameter ctx of io_submit_state_start</h2>
 <h2> [235] da8c96906990 - io_uring: mark us with IORING_FEAT_SUBMIT_STABLE</h2>
+<p>rt</p>
 <h2> [234] f499a021ea8c - io_uring: ensure async punted connect requests copy data</h2>
 <h2> [233] 03b1230ca12a - io_uring: ensure async punted sendmsg/recvmsg requests copy data</h2>
 <h2> [232] f67676d160c6 - io_uring: ensure async punted read/write requests copy iovec</h2>
+<p>[231] 1a6b74fc8702中的2）原先是统一申请req-&gt;io，现在就放到只有read/write才会申请io，同时复制iovec</p>
+<p>同时增加了io_req_defer_prep，专门用来对各种type来做prep，比如read/write，sendmsg/recvmsg，connect</p>
 <h2> [231] 1a6b74fc8702 - io_uring: add general async offload context</h2>
 <p>去掉REQ_F_FREE_SQE用req-&gt;io代替，包括3种场景：1）defer_list 2）async context 3）link_list上除头节点的节点</p>
 <h2> [230] 441cdbd5449b - io_uring: transform send/recvmsg() -ERESTARTSYS to -EINTR</h2>
@@ -3706,7 +3726,9 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <p>io_prep_linked_timeout 1）当前是link下一个是link_timeout的，返回link_timeout的req</p>
 <p>io_prep_async_work 1）选择对应的workqueue(UNBOUND/BOUND) 2）返回io_prep_linked_timeout得到的link_timeout的req
 需要考虑的场景：1）io_queue_async_work 2）__io_queue_sqe</p>
-<p>io_queue_linked_timeout 打开定时器</p>
+<p>io_submit_sqe中将req挂接到req-&gt;link_list上，因为list_empty是判断节点是否指向自己，所以此时判断link req是否非空，结果是非空</p>
+<p>io_timeout_fn和io_timeout_cancel和io_kill_timeout和io_link_timeout_fn，会list_del_init，这时候req就为空</p>
+<p>io_queue_linked_timeout 打开定时器,判断req是否为空，按照上面两种情况，只有没做或者未取消才会非空，所以这时候才需要打开定时器</p>
 <div class="language-text line-numbers-mode" data-ext="text"><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2> [192] ad8a48acc23c - io_uring: make req-&gt;timeout be dynamically allocated</h2>
 <h2> [191] 978db57e2c32 - io_uring: make io_double_put_req() use normal completion path</h2>
 <h2> [190] 0e0702dac26b - io_uring: cleanup return values from the queueing functions</h2>
