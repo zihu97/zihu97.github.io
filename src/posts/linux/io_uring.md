@@ -3494,19 +3494,66 @@ tee io_uring.commit.list
 ## [247] d96885658d99 - io_uring: deferred send/recvmsg should assign iov
 ## [246] 8a4955ff1cca - io_uring: sqthread should grab ctx->uring_lock for submissions
 ## [245] 4e88d6e7793f - io_uring: allow unbreakable links
+
 ## [244] 0b4295b5e2b9 - io_uring: fix a typo in a comment
+
+rt
+
+
+
 ## [243] 4493233edcfc - io_uring: hook all linked requests via link_list
+
+req->list
+> io_cqring_fill_event 如果cq满了，且不强制flush就添加到ctx->cq_overflow_list
+> io_iopoll_req_issued IORING_SETUP_IOPOLL的情况下加入ctx->poll_list
+> io_timeout           有超时需求的就放到ctx->timeout_list
+> io_req_defer         如果是drain的req，就加入ctx->defer_list
+> io_submit_sqe        link req非首节点就放到req->link_list
+
+req->link_list
+> io_submit_sqe        link req首节点就初始化，剩下的就放到首节点的link_list上，之后做完一个把做完的req->link_list给nxt->link_list
+
+原先都是用req->list通过io_submit_sqe的方式区分首节点，然后再通过io_req_link_next将link_list之后的节点转接到nxt上，现在改为直接用每个req->link_list来进行拼接，也就是说，每个req->link_list都可以作为一个链表的头节点，那么做完当前的link req之后只要删除当前req的节点即可，不需要再list_splice
+
+
+
 ## [242] 2e6e1fde32d7 - io_uring: fix error handling in io_queue_link_head
+
+rt
+
+
+
 ## [241] 78076bb64aa8 - io_uring: use hash table for poll command lookups
+
+使用哈希表代替红黑树，减少查询时间，原来修改是[188] eac406c61cd0
+
+
+
 ## [240] 2d28390aff87 - io_uring: ensure deferred timeouts copy necessary data
+
+将timeout也放入io_req_defer_prep的管理
+
+
+
 ## [239] 901e59bba9dd - io_uring: allow IO_SQE_* flags on IORING_OP_TIMEOUT
 ## [238] 87f80d623c6c - io_uring: handle connect -EINPROGRESS like -EAGAIN
 ## [237] 8cdda87a4414 - io_uring: remove io_wq_current_is_worker
 ## [236] 22efde599865 - io_uring: remove parameter ctx of io_submit_state_start
 ## [235] da8c96906990 - io_uring: mark us with IORING_FEAT_SUBMIT_STABLE
+
+rt
+
+
+
 ## [234] f499a021ea8c - io_uring: ensure async punted connect requests copy data
 ## [233] 03b1230ca12a - io_uring: ensure async punted sendmsg/recvmsg requests copy data
 ## [232] f67676d160c6 - io_uring: ensure async punted read/write requests copy iovec
+
+[231] 1a6b74fc8702中的2）原先是统一申请req->io，现在就放到只有read/write才会申请io，同时复制iovec
+
+同时增加了io_req_defer_prep，专门用来对各种type来做prep，比如read/write，sendmsg/recvmsg，connect
+
+
 
 ## [231] 1a6b74fc8702 - io_uring: add general async offload context
 
@@ -3691,7 +3738,11 @@ io_prep_linked_timeout 1）当前是link下一个是link_timeout的，返回link
 io_prep_async_work 1）选择对应的workqueue(UNBOUND/BOUND) 2）返回io_prep_linked_timeout得到的link_timeout的req
                     需要考虑的场景：1）io_queue_async_work 2）__io_queue_sqe
 
-io_queue_linked_timeout 打开定时器
+io_submit_sqe中将req挂接到req->link_list上，因为list_empty是判断节点是否指向自己，所以此时判断link req是否非空，结果是非空
+
+io_timeout_fn和io_timeout_cancel和io_kill_timeout和io_link_timeout_fn，会list_del_init，这时候req就为空
+
+io_queue_linked_timeout 打开定时器,判断req是否为空，按照上面两种情况，只有没做或者未取消才会非空，所以这时候才需要打开定时器
 
 ```
 io_queue_linked_timeout                          - __io_queue_sqe
