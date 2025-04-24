@@ -3465,21 +3465,69 @@ tee io_uring.commit.list
 ## [276] 74566df3a71c - io_uring: don't setup async context for read/write fixed
 ## [275] eacc6dfaea96 - io_uring: remove punt of short reads to async context
 ## [274] 3529d8c2b353 - io_uring: pass in 'sqe' to the prep handlers
+
+
+
+
+
 ## [273] 06b76d44ba25 - io_uring: standardize the prep methods
+
+因为一些必要的参数都放到了req里面，所以req->sqe可以不需要了，所以prep完设置req->sqe=NULL就可以通过req->sqe来判断是否已prep取代REQ_F_PREPPED，而req->io->sqe也不需要存在了，因为内容已经提前放到req了
+
+
+
 ## [272] 26a61679f10c - io_uring: read 'count' for IORING_OP_TIMEOUT in prep handler
 ## [271] e47293fdf989 - io_uring: move all prep state for IORING_OP_{SEND,RECV}_MGS to prep handler
 ## [270] 3fbb51c18f5c - io_uring: move all prep state for IORING_OP_CONNECT to prep handler
 ## [269] 9adbd45d6d32 - io_uring: add and use struct io_rw for read/writes
+
+与[259] 8ed8d3c3bc32同样的思路
+
+
+
 ## [268] d55e5f5b70dd - io_uring: use u64_to_user_ptr() consistently
+
+使用u64_to_user_ptr来代替u64到用户态指针的强制转换
+
+
+
 ## [267] fd6c2e4c063d - io_uring: io_wq_submit_work() should not touch req->rw
+
+req->rw.ki_flags会翻转IOCB_NOWAIT，实际上只有read/write才需要，对于其他的opcode是不需要的，所以放到了合适的位置
+
+
+
 ## [266] 7c504e65206a - io_uring: don't wait when under-submitting
+
+rt
+
+
+
 ## [265] e781573e2fb1 - io_uring: warn about unhandled opcode
 ## [264] d625c6ee4975 - io_uring: read opcode and user_data from SQE exactly once
 ## [263] b29472ee7b53 - io_uring: make IORING_OP_TIMEOUT_REMOVE deferrable
 ## [262] fbf23849b172 - io_uring: make IORING_OP_CANCEL_ASYNC deferrable
 ## [261] 0969e783e3a8 - io_uring: make IORING_POLL_ADD and IORING_POLL_REMOVE deferrable
+
+与[259] 8ed8d3c3bc32同样的思路,不仅是user_data,opcode也是从sqe取的，其实思路都是一样的，只要是defer的都应该保留一份原来的副本在req中
+
+
+
 ## [260] ffbb8d6b7691 - io_uring: make HARDLINK imply LINK
+
+把IOSQE_IO_HARDLINK设置为IOSQE_IO_LINK的一种特殊情况，也就是设置了hardlink可以不设置link
+
+
+
 ## [259] 8ed8d3c3bc32 - io_uring: any deferred command must have stable sqe data
+
+设置DRAIN被放到defer_list上的req因为不是在当前提交的上下文执行，所以存在两种可能的情况：1）一些在异步上下文获取不到的数据需要提前获取，2）因为sqe被提交，所以用户认为可以重用sqe导致defer req执行时再读原来的sqe结构读到了新的sqe的脏数据，这里主要对第2种情况加了处理
+
+处理包括1）复制sqe的数据到req保存 2）通过REQ_F_PREPPED保证已经读取的数据不会读第二遍，这种处理才能保证在任何情况下这些req可以被推迟执行，否则不能叫做deferrable
+
+通过io_req_cancelled支持了一些command的异步取消
+
+
 
 ## [258] fc4df999e24f - io_uring: remove 'sqe' parameter to the OP helpers that take it
 
