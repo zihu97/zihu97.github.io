@@ -3425,33 +3425,110 @@ tee io_uring.commit.list
 ## [316] cebdb98617ae - io_uring: add support for IORING_OP_OPENAT2
 ## [315] f8748881b17d - io_uring: remove 'fname' from io_open structure
 ## [314] c12cedf24e78 - io_uring: add 'struct open_how' to the openat request context
+
 ## [313] f2842ab5b72d - io_uring: enable option to only trigger eventfd for async completions
 ## [312] 69b3e546139a - io_uring: change io_ring_ctx bool fields into bit fields
 ## [311] c150368b4968 - io_uring: file set registration should use interruptible waits
 ## [310] 96fd84d83a77 - io_uring: Remove unnecessary null check
 ## [309] fddafacee287 - io_uring: add support for send(2) and recv(2)
 ## [308] 2550878f8421 - io_uring: remove extra io_wq_current_is_worker()
+
+rt
+
+
+
 ## [307] caf582c652fe - io_uring: optimise commit_sqring() for common case
 ## [306] ee7d46d9db19 - io_uring: optimise head checks in io_get_sqring()
 ## [305] 9ef4f124894b - io_uring: clamp to_submit in io_submit_sqes()
 ## [304] 8110c1a6212e - io_uring: add support for IORING_SETUP_CLAMP
+
+支持在用户设置IORING_SETUP_CLAMP的情况下，如果请求的entry超过了最大值，不会报错，而是调整为最大值
+
+
+
 ## [303] c6ca97b30c47 - io_uring: extend batch freeing to cover more cases
+
+io_free_req_many把__io_free_req中的操作加入进去，这样可以支持多个req的同时释放
+
+
+
 ## [302] 8237e045983d - io_uring: wrap multi-req freeing in struct req_batch
 ## [301] 2b85edfc0c90 - io_uring: batch getting pcpu references
+
+之前是有nr个req要处理，在每个req里percpu_ref_tryget，改用批处理percpu_ref_tryget_many，提升性能
+
+
+
 ## [300] c1ca757bd6f4 - io_uring: add IORING_OP_MADVISE
 ## [299] db08ca25253d - mm: make do_madvise() available internally
 ## [298] 4840e418c2fc - io_uring: add IORING_OP_FADVISE
 ## [297] ba04291eb66e - io_uring: allow use of offset == -1 to mean file position
 ## [296] 3a6820f2bb8a - io_uring: add non-vectored read/write commands
+
+rt
+
+
+
 ## [295] e94f141bd248 - io_uring: improve poll completion performance
+
+通过ctx->poll_llist，如果获取不到锁，就延后异步释放poll_add req
+
+
+
 ## [294] ad3eb2c89fb2 - io_uring: split overflow state into SQ and CQ side
+
+通过增加sq_check_overflow/cq_check_overflow的位判断取代cq_overflow_list链表的非空判断，避免缓存波动
+
+
+
 ## [293] d3656344fea0 - io_uring: add lookup table for various opcode needs
+
+增加io_op_defs通过查表来标识各个op的属性如need_mm/need_file/need_io等，同时增加BUILD_BUG_ON来做编译器检查
+
+
+
 ## [292] add7b6b85a4d - io_uring: remove two unnecessary function declarations
 ## [291] 32fe525b6d10 - io_uring: move *queue_link_head() from common path
 ## [290] 9d76377f7e13 - io_uring: rename prev to head
+
+rt
+
+
+
 ## [289] ce35a47a3a02 - io_uring: add IOSQE_ASYNC
+
+支持通过REQ_F_FORCE_ASYNC强制放到async context
+
+
+
 ## [288] eddc7ef52a6b - io_uring: add support for IORING_OP_STATX
+
+rt
+
+
+
 ## [287] 05f3fb3c5397 - io_uring: avoid ring quiesce for fixed file set unregister and update
+
+io_ring_file_ref_switch(work) - io_sqe_files_unregister(取消文件注册)
+                              - io_file_data_ref_zero（文件引用计数到0自动调用）
+                              - io_queue_file_removal（文件表更新删除旧的文件）
+
+
+data->refs - io_req_set_file/__io_free_req（req执行前后有引用计数）
+           - io_sqe_files_unregister（取消文件注册时避免正在原子/percpu切换用作保护）
+           - io_ring_file_ref_switch（异步释放文件句柄时增加引用）
+           - __io_sqe_files_update（更新结束时减少引用）
+           - io_queue_file_removal（只用于内存不足时）
+           - percpu_ref_switch_to_*(异步释放文件时变为atomic如果释放完成恢复percpu，看起来在读多写少或高并发读写场景下性能有提升)
+
+data->state - io_atomic_switch（在所有cpu切换到atomic mode后清掉，看起来是用来标识正在从percpu切换到atomic的状态）
+
+complete(&done); - fixed_file_data->done - io_sqe_files_unregister - io_file_ref_kill(取消文件注册时等待文件引用计数到零后安全取消)
+                 - pfile->done - io_queue_file_removal（更新删除旧的文件时创建，只用于内存不足时用来等待新的空闲file）
+                               - io_ring_file_ref_switch（flush_work时完成）
+
+
+
 ## [286] b5dba59e0cf7 - io_uring: add support for IORING_OP_CLOSE
 ## [285] 15b71abe7b52 - io_uring: add support for IORING_OP_OPENAT
 ## [284] 35cb6d54c1d5 - fs: make build_open_flags() available internally
@@ -3464,9 +3541,14 @@ tee io_uring.commit.list
 ## [277] 78912934f4f7 - io_uring: be consistent in assigning next work from handler
 ## [276] 74566df3a71c - io_uring: don't setup async context for read/write fixed
 ## [275] eacc6dfaea96 - io_uring: remove punt of short reads to async context
+
+rt
+
+
+
 ## [274] 3529d8c2b353 - io_uring: pass in 'sqe' to the prep handlers
 
-
+逻辑大体看起来就是提取sqe不把他放在req中，通过把prep在更早的时机做完这样到后面不需要再判断是否还需要prep，将操作划分为prep+finish
 
 
 
