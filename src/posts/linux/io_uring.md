@@ -3251,11 +3251,31 @@ tee io_uring.commit.list
 ## [342] 87ce955b24c9 - io_uring: add ->show_fdinfo() for the io_uring file descriptor
 ## [341] 3e4827b05d2a - io_uring: add support for epoll_ctl(2)
 ## [340] f86cd20c9454 - io_uring: fix linked command file table usage
+
+
+
+
+
 ## [339] 75c6a03904e0 - io_uring: support using a registered personality for commands
 ## [338] 071698e13ac6 - io_uring: allow registering credentials
+
+支持用户主动注册creds，而不是一定要用current的cred，使用idr来管理
+
+
+
 ## [337] 24369c2e3bb0 - io_uring: add io-wq workqueue sharing
 ## [336] eba6f5a330cf - io-wq: allow grabbing existing io-wq
+
+使用IORING_SETUP_ATTACH_WQ可以复用其他fd的workqueue
+
+
+
 ## [335] cccf0ee83455 - io_uring/io-wq: don't use static creds/mm assignments
+
+通过直接获取当前的creds/mm而不是保存，避免重入可能引发的问题
+
+
+
 ## [334] 848f7e1887c4 - io-wq: make the io_wq ref counted
 ## [333] 9466f43741bc - io_uring: fix refcounting with batched allocations at OOM
 ## [332] 8cdf2193a333 - io_uring: add comment for drain_next
@@ -3263,6 +3283,10 @@ tee io_uring.commit.list
 ## [330] ebe10026210f - io_uring: don't cancel all work on process exit
 ## [329] 73e08e711d9c - Revert "io_uring: only allow submit from owning task"
 ## [328] 86a761f81ec8 - io_uring: honor IOSQE_ASYNC for linked reqs
+
+rt
+
+
 
 ## [327] 1118591ab883 - io_uring: prep req when do IOSQE_ASYNC
 
@@ -3297,7 +3321,7 @@ rt
 
 ## [320] 711be0312df4 - io_uring: optimise use of ctx->drain_next
 
-如果已经有link头节点了，当前是IOSQE_IO_DRAIN,那么就会变为REQ_F_DRAIN_LINK，要求下一个强制变为IOSQE_IO_DRAIN，因为下一个不能提前完成，因为要保证link的都做完
+如果已经有link头节点了，当前是IOSQE_IO_DRAIN,那么就会变为REQ_F_DRAIN_LINK，要求下一个强制变为IOSQE_IO_DRAIN，因为下一个不能提前完成，因为要保证link的都做完,含义可以见[332] 8cdf2193a333注释
 
 
 
