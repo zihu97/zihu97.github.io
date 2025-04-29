@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Tue, 29 Apr 2025 06:28:49 GMT</pubDate>
-    <lastBuildDate>Tue, 29 Apr 2025 06:28:49 GMT</lastBuildDate>
+    <pubDate>Tue, 29 Apr 2025 11:03:10 GMT</pubDate>
+    <lastBuildDate>Tue, 29 Apr 2025 11:03:10 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3377,9 +3377,12 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [340] f86cd20c9454 - io_uring: fix linked command file table usage</h2>
 <h2> [339] 75c6a03904e0 - io_uring: support using a registered personality for commands</h2>
 <h2> [338] 071698e13ac6 - io_uring: allow registering credentials</h2>
+<p>支持用户主动注册creds，而不是一定要用current的cred，使用idr来管理</p>
 <h2> [337] 24369c2e3bb0 - io_uring: add io-wq workqueue sharing</h2>
 <h2> [336] eba6f5a330cf - io-wq: allow grabbing existing io-wq</h2>
+<p>使用IORING_SETUP_ATTACH_WQ可以复用其他fd的workqueue</p>
 <h2> [335] cccf0ee83455 - io_uring/io-wq: don't use static creds/mm assignments</h2>
+<p>通过直接获取当前的creds/mm而不是保存，避免重入可能引发的问题</p>
 <h2> [334] 848f7e1887c4 - io-wq: make the io_wq ref counted</h2>
 <h2> [333] 9466f43741bc - io_uring: fix refcounting with batched allocations at OOM</h2>
 <h2> [332] 8cdf2193a333 - io_uring: add comment for drain_next</h2>
@@ -3387,6 +3390,7 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [330] ebe10026210f - io_uring: don't cancel all work on process exit</h2>
 <h2> [329] 73e08e711d9c - Revert "io_uring: only allow submit from owning task"</h2>
 <h2> [328] 86a761f81ec8 - io_uring: honor IOSQE_ASYNC for linked reqs</h2>
+<p>rt</p>
 <h2> [327] 1118591ab883 - io_uring: prep req when do IOSQE_ASYNC</h2>
 <p>prep - io_req_defer_prep - io_req_defer
 - io_queue_sqe(REQ_F_FORCE_ASYNC)
@@ -3403,7 +3407,7 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [321] 0791015837f1 - io_uring: remove extra check in __io_commit_cqring</h2>
 <p>rt</p>
 <h2> [320] 711be0312df4 - io_uring: optimise use of ctx-&gt;drain_next</h2>
-<p>如果已经有link头节点了，当前是IOSQE_IO_DRAIN,那么就会变为REQ_F_DRAIN_LINK，要求下一个强制变为IOSQE_IO_DRAIN，因为下一个不能提前完成，因为要保证link的都做完</p>
+<p>如果已经有link头节点了，当前是IOSQE_IO_DRAIN,那么就会变为REQ_F_DRAIN_LINK，要求下一个强制变为IOSQE_IO_DRAIN，因为下一个不能提前完成，因为要保证link的都做完,含义可以见[332] 8cdf2193a333注释</p>
 <h2> [319] 66f4af93da57 - io_uring: add support for probing opcodes</h2>
 <p>提供IORING_REGISTER_PROBE显示，避免实际触发操作才知道op支不支持</p>
 <h2> [318] 10fef4bebf97 - io_uring: account fixed file references correctly in batch</h2>
