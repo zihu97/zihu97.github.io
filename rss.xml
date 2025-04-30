@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Tue, 29 Apr 2025 11:03:10 GMT</pubDate>
-    <lastBuildDate>Tue, 29 Apr 2025 11:03:10 GMT</lastBuildDate>
+    <pubDate>Wed, 30 Apr 2025 10:15:48 GMT</pubDate>
+    <lastBuildDate>Wed, 30 Apr 2025 10:15:48 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3371,10 +3371,16 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [346] f0b493e6b9a8 - io_uring: prevent potential eventfd recursion on poll</h2>
 <h2> [345] 2113b05d039e - fs/io_uring: set FOLL_PIN via pin_user_pages()</h2>
 <h2> [344] a43e982082c2 - mm/gup: factor out duplicate code from four routines</h2>
+<p>rt</p>
 <h2> [343] d7f62e825fd1 - io_uring: add BUILD_BUG_ON() to assert the layout of struct io_uring_sqe</h2>
+<p>通过BUILD_BUG_ON这样的编译器检查确保结构体布局符合预期</p>
 <h2> [342] 87ce955b24c9 - io_uring: add -&gt;show_fdinfo() for the io_uring file descriptor</h2>
+<p>增加.show_fdinfo来显示creds</p>
 <h2> [341] 3e4827b05d2a - io_uring: add support for epoll_ctl(2)</h2>
+<p>rt</p>
 <h2> [340] f86cd20c9454 - io_uring: fix linked command file table usage</h2>
+<p>原先是当accept等op需要defer的时候才要grab file，因此设置了IO_WQ_WORK_NEEDS_FILES，改为accept这些op不管是不是defer都grab file，这样也不需要这个flag，通过work.files就可以判断</p>
+<p>同时因为可能会存在直接做到放到async context两次避免重复grab file因此对io_grab_files进行判断已经grab了的就跳过</p>
 <h2> [339] 75c6a03904e0 - io_uring: support using a registered personality for commands</h2>
 <h2> [338] 071698e13ac6 - io_uring: allow registering credentials</h2>
 <p>支持用户主动注册creds，而不是一定要用current的cred，使用idr来管理</p>
