@@ -3244,15 +3244,38 @@ tee io_uring.commit.list
 ## [349] 9250f9ee194d - io_uring: remove extra ->file check
 ## [348] 5d204bcfa093 - io_uring: don't map read/write iovec potentially twice
 ## [347] 0b7b21e42ba2 - io_uring: use the proper helpers for io_send/recv
+
 ## [346] f0b493e6b9a8 - io_uring: prevent potential eventfd recursion on poll
 ## [345] 2113b05d039e - fs/io_uring: set FOLL_PIN via pin_user_pages()
 ## [344] a43e982082c2 - mm/gup: factor out duplicate code from four routines
+
+rt
+
+
+
 ## [343] d7f62e825fd1 - io_uring: add BUILD_BUG_ON() to assert the layout of struct io_uring_sqe
+
+通过BUILD_BUG_ON这样的编译器检查确保结构体布局符合预期
+
+
+
 ## [342] 87ce955b24c9 - io_uring: add ->show_fdinfo() for the io_uring file descriptor
+
+增加.show_fdinfo来显示creds
+
+
+
 ## [341] 3e4827b05d2a - io_uring: add support for epoll_ctl(2)
+
+rt
+
+
+
 ## [340] f86cd20c9454 - io_uring: fix linked command file table usage
 
+原先是当accept等op需要defer的时候才要grab file，因此设置了IO_WQ_WORK_NEEDS_FILES，改为accept这些op不管是不是defer都grab file，这样也不需要这个flag，通过work.files就可以判断
 
+同时因为可能会存在直接做到放到async context两次避免重复grab file因此对io_grab_files进行判断已经grab了的就跳过
 
 
 
