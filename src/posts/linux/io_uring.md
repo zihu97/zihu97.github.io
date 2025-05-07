@@ -3210,27 +3210,110 @@ tee io_uring.commit.list
 ## [383] 41726c9a50e7 - io_uring: fix personality idr leak
 ## [382] 193155c8c942 - io_uring: handle multiple personalities in link chains
 ## [381] c7849be9cc2d - io_uring: fix __io_iopoll_check deadlock in io_sq_thread
+
+
+
+
+
 ## [380] 7143b5ac5750 - io_uring: prevent sq_thread from spinning when it should stop
+
+确保在cond_resched();前释放mm，否则可能会永远持有导致不释放
+
+
+
 ## [379] 929a3af90f0f - io_uring: fix use-after-free by io_cleanup_req()
+
+当前在__io_req_aux_free已经释放了req->io，再调用io_cleanup_req就会出现UAF，因此把io_cleanup_req移动到req->io释放前
+
+
+
 ## [378] 297a31e3e831 - io_uring: remove unnecessary NULL checks
 ## [377] 7fbeb95d0f68 - io_uring: add missing io_req_cancelled()
+
+rt
+
+
+
 ## [376] 2ca10259b418 - io_uring: prune request from overflow list on flush
+
+overflow list上的req会再持有一个引用计数，在flush的时候没有考虑到，通过flag：REQ_F_OVERFLOW增加对这种情况的处理
+
+
+
 ## [375] 7563439adfae - io-wq: don't call kXalloc_node() with non-online node
+
+rt
+
+
+
 ## [374] b537916ca510 - io_uring: retain sockaddr_storage across send/recvmsg async punt
+
+addr是个临时变量，kmsg->msg.msg_name取的是addr地址，所以有问题
+
+
+
 ## [373] 6ab231448fdc - io_uring: cancel pending async work if task exits
 ## [372] 36282881a795 - io-wq: add io_wq_cancel_pid() to cancel based on a specific pid
+
+对于没被追踪的work需要单独取消work，通过pid的方式
+
+因为flush里面只包含了io_uring_cancel_files,即file_table为1才会追踪，其他文件需要等到完成才能释放资源，为了保证能够及时释放资源，因此其他work也需要取消
+
+
+
 ## [371] 00bcda13dcbf - io-wq: make io_wqe_cancel_work() take a match handler
+
+rt
+
+
+
 ## [370] 0bdbdd08a8f9 - io_uring: fix openat/statx's filename leak
 ## [369] 5f798beaf35d - io_uring: fix double prep iovec leak
+
+通过!req->io来确保只有分配了async ctx才能处理io，这是保证在正常情况下
+
+io_alloc_async_ctx - io_setup_async_rw...(async prep)
+                   - io_req_defer(defer prep)
+
+在上面两种共同存在情况下就会出现多次prep，这时候就会反复产生iovec，通过REQ_F_NEED_CLEANUP来解决
+
+不defer但是force_async,link头是不分配async ctx,TODO那什么时候分配还是不分配呢？
+
+
+
 ## [368] a93b33312f63 - io_uring: fix async close() with f_op->flush()
+
+rt
+
+
+
 ## [367] 0b5faf6ba7fb - io_uring: allow AT_FDCWD for non-file openat/openat2/statx
+
+openat(AT_FDCWD, "file.txt", O_RDWR);和open("file.txt", O_RDWR); 的效果是一样，以当前目录为基准，同时又没有传统open隐含的多线程问题
+
+同时因为AT_FDCWD是-100，不是-1所以需要单独处理
+
+
+
 ## [366] ff002b30181d - io_uring: grab ->fs as part of async preparation
 ## [365] 9392a27d88b9 - io-wq: add support for inheriting ->fs
+
+保存current->fs到work，估计是像open这些操作可能出现进程文件不一致的情况
+
+
+
 ## [364] faac996ccd5d - io_uring: retry raw bdev writes if we hit -EOPNOTSUPP
+
+rt
+
+
+
 ## [363] 8fef80bf56a4 - io_uring: add cleanup for openat()/statx()
 ## [362] 99bc4c38537d - io_uring: fix iovec leaks
 
 增加了REQ_F_NEED_CLEANUP，在io_req_map_rw/io_sendmsg_prep/io_recvmsg_prep中设置，在free的时候如果设置了就free iovec等，看起来fast_iov是现成的，iov是新创建的，不能简单判空来处理，所以通过flag
+
+异常退出的时候没有单独对所有额外申请的内存做释放，通过REQ_F_NEED_CLEANUP这样来统一管理所有op的异常释放
 
 
 
