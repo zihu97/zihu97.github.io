@@ -3229,22 +3229,90 @@ tee io_uring.commit.list
 ## [364] faac996ccd5d - io_uring: retry raw bdev writes if we hit -EOPNOTSUPP
 ## [363] 8fef80bf56a4 - io_uring: add cleanup for openat()/statx()
 ## [362] 99bc4c38537d - io_uring: fix iovec leaks
+
+增加了REQ_F_NEED_CLEANUP，在io_req_map_rw/io_sendmsg_prep/io_recvmsg_prep中设置，在free的时候如果设置了就free iovec等，看起来fast_iov是现成的，iov是新创建的，不能简单判空来处理，所以通过flag
+
+
+
 ## [361] e96e977992d0 - io_uring: remove unused struct io_async_open
 ## [360] 63e5d81f72af - io_uring: flush overflowed CQ events in the io_uring_poll()
 ## [359] cf3040ca55f2 - io_uring: statx/openat/openat2 don't support fixed files
+
+rt
+
+
+
 ## [358] 1e95081cb5b4 - io_uring: fix deferred req iovec leak
+
+io_{read,write,send,recv}()等在释放时增加了io_wq_current_is_worker的判断，那么就是在kernel thread的场景下不会释放iovec(TODO还是不好理解），当通过io_wq_submit_work提交时，此时也不会进入io_setup_async_rw放到workqueue进行异步释放，因此如其他op统一在io_{read,write,send,recv}()中释放
+
+修复了另一个失败场景下的内存泄漏
+
+
+
 ## [357] e1d85334d623 - io_uring: fix 1-bit bitfields to be unsigned
+
+1位的命名位域（named bit-field）不能声明为有符号类型​​，避免因位宽不足导致无法表示有效数值。例如，1位的有符号位域仅能表示符号位（0或1），但无实际数据位，导致无法存储有效值（如仅能表示0或-0，这无实际意义）
+
+
+
 ## [356] 1cb1edb2f5ba - io_uring: get rid of delayed mm check
+
+needs_mm的情况就确保grab mm，否则提前退出，之前通过判断*mm == NULL以及，*mm非NULL后io-wq设置IO_WQ_WORK_HAS_MM再判断来处理
+
+
+
 ## [355] 2faf852d1be8 - io_uring: cleanup fixed file data table references
+
+之前是通过flush_work(&data->ref_work);来刷新，但实际上可能出现io_ring_file_ref_switch这个回调执行的晚导致在接下来io_sqe_files_unregister中data被free了才执行，这样会出现UAF问题，因此现在改为如果已经在percpu-ref切换过程中就不触发回调（percpu_ref_kill_and_confirm会设置__PERCPU_REF_DEAD，判断percpu_ref_is_dying就可以知道是否到了退出流程），手动flush
+
+
+
 ## [354] df069d80c8e3 - io_uring: spin for sq thread to idle on shutdown
+
+避免一边提交一边退出取消work导致可能发生的冲突遗漏取消部分work,因此设定为只有kernel thread在idle的时候才退出取消work
+
+
+
 ## [353] 3e577dcd73a1 - io_uring: put the flag changing code in the same spot
+
+rt
+
+
+
 ## [352] 6c8a31346925 - io_uring: iterate req cache backwards
+
+批处理情况下，分配一批req到state->reqs，原先free_reqs代表剩余的req数，cur_req代表当前的req数，通过一个小trick即从一批req的倒着往前用，那么cur_req就可以用free_reqs来表示，因此可以删掉cur_req这个字段
+
+
+
 ## [351] 3e69426da259 - io_uring: punt even fadvise() WILLNEED to async context
+
+预读可能会阻塞，涉及的POSIX_FADV_WILLNEED可能会阻塞所以放到async context
+
+
+
 ## [350] 1a417f4e618e - io_uring: fix sporadic double CQE entry for close
+
+放到async context的范式是
+block:     *_finish
+nonblock:  req->work.func = *_finish;
+           io_put_req(req);
+
+*_finish - fail:req_set_fail_links
+         - io_cqring_add_event
+         - io_put_req_find_next
+         - io_wq_assign_next
+
+在io_close的场景下，因为需要将fput放到后处理所以一定会放到async context，同时需要拿到req->close.put_file，所以没有在non-block下释放req，放到了*_finish的代码中，这是原先代码与范式差异的地方
+
+但是这种情况下如果在放到async context前已经成功产生cqe，io_close__io_queue_sqe判断io_close是-EAGAIN，会判断file_table，而io_close是1，因此会io_grab_files导致req->work.files再一次被赋值，因此会再一次进入io_close_finish再释放一次fd和产生一次cqe，这就会产生重复的cqe，修改方案是不返回-EAGAIN，直接queue_work这样就不会进入io_grab_files导致再次产生cqe
+
+
+
 ## [349] 9250f9ee194d - io_uring: remove extra ->file check
 ## [348] 5d204bcfa093 - io_uring: don't map read/write iovec potentially twice
 ## [347] 0b7b21e42ba2 - io_uring: use the proper helpers for io_send/recv
-
 ## [346] f0b493e6b9a8 - io_uring: prevent potential eventfd recursion on poll
 ## [345] 2113b05d039e - fs/io_uring: set FOLL_PIN via pin_user_pages()
 ## [344] a43e982082c2 - mm/gup: factor out duplicate code from four routines
