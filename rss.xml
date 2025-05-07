@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Wed, 07 May 2025 01:36:51 GMT</pubDate>
-    <lastBuildDate>Wed, 07 May 2025 01:36:51 GMT</lastBuildDate>
+    <pubDate>Wed, 07 May 2025 11:03:22 GMT</pubDate>
+    <lastBuildDate>Wed, 07 May 2025 11:03:22 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -3335,25 +3335,45 @@ Node 是真正运行业务负载的，每个业务负载会以 Pod 的形式运�
 <h2> [382] 193155c8c942 - io_uring: handle multiple personalities in link chains</h2>
 <h2> [381] c7849be9cc2d - io_uring: fix __io_iopoll_check deadlock in io_sq_thread</h2>
 <h2> [380] 7143b5ac5750 - io_uring: prevent sq_thread from spinning when it should stop</h2>
+<p>确保在cond_resched();前释放mm，否则可能会永远持有导致不释放</p>
 <h2> [379] 929a3af90f0f - io_uring: fix use-after-free by io_cleanup_req()</h2>
+<p>当前在__io_req_aux_free已经释放了req-&gt;io，再调用io_cleanup_req就会出现UAF，因此把io_cleanup_req移动到req-&gt;io释放前</p>
 <h2> [378] 297a31e3e831 - io_uring: remove unnecessary NULL checks</h2>
 <h2> [377] 7fbeb95d0f68 - io_uring: add missing io_req_cancelled()</h2>
+<p>rt</p>
 <h2> [376] 2ca10259b418 - io_uring: prune request from overflow list on flush</h2>
+<p>overflow list上的req会再持有一个引用计数，在flush的时候没有考虑到，通过flag：REQ_F_OVERFLOW增加对这种情况的处理</p>
 <h2> [375] 7563439adfae - io-wq: don't call kXalloc_node() with non-online node</h2>
+<p>rt</p>
 <h2> [374] b537916ca510 - io_uring: retain sockaddr_storage across send/recvmsg async punt</h2>
+<p>addr是个临时变量，kmsg-&gt;msg.msg_name取的是addr地址，所以有问题</p>
 <h2> [373] 6ab231448fdc - io_uring: cancel pending async work if task exits</h2>
 <h2> [372] 36282881a795 - io-wq: add io_wq_cancel_pid() to cancel based on a specific pid</h2>
+<p>对于没被追踪的work需要单独取消work，通过pid的方式</p>
+<p>因为flush里面只包含了io_uring_cancel_files,即file_table为1才会追踪，其他文件需要等到完成才能释放资源，为了保证能够及时释放资源，因此其他work也需要取消</p>
 <h2> [371] 00bcda13dcbf - io-wq: make io_wqe_cancel_work() take a match handler</h2>
+<p>rt</p>
 <h2> [370] 0bdbdd08a8f9 - io_uring: fix openat/statx's filename leak</h2>
 <h2> [369] 5f798beaf35d - io_uring: fix double prep iovec leak</h2>
+<p>通过!req-&gt;io来确保只有分配了async ctx才能处理io，这是保证在正常情况下</p>
+<p>io_alloc_async_ctx - io_setup_async_rw...(async prep)
+- io_req_defer(defer prep)</p>
+<p>在上面两种共同存在情况下就会出现多次prep，这时候就会反复产生iovec，通过REQ_F_NEED_CLEANUP来解决</p>
+<p>不defer但是force_async,link头是不分配async ctx,TODO那什么时候分配还是不分配呢？</p>
 <h2> [368] a93b33312f63 - io_uring: fix async close() with f_op-&gt;flush()</h2>
+<p>rt</p>
 <h2> [367] 0b5faf6ba7fb - io_uring: allow AT_FDCWD for non-file openat/openat2/statx</h2>
+<p>openat(AT_FDCWD, "file.txt", O_RDWR);和open("file.txt", O_RDWR); 的效果是一样，以当前目录为基准，同时又没有传统open隐含的多线程问题</p>
+<p>同时因为AT_FDCWD是-100，不是-1所以需要单独处理</p>
 <h2> [366] ff002b30181d - io_uring: grab -&gt;fs as part of async preparation</h2>
 <h2> [365] 9392a27d88b9 - io-wq: add support for inheriting -&gt;fs</h2>
+<p>保存current-&gt;fs到work，估计是像open这些操作可能出现进程文件不一致的情况</p>
 <h2> [364] faac996ccd5d - io_uring: retry raw bdev writes if we hit -EOPNOTSUPP</h2>
+<p>rt</p>
 <h2> [363] 8fef80bf56a4 - io_uring: add cleanup for openat()/statx()</h2>
 <h2> [362] 99bc4c38537d - io_uring: fix iovec leaks</h2>
 <p>增加了REQ_F_NEED_CLEANUP，在io_req_map_rw/io_sendmsg_prep/io_recvmsg_prep中设置，在free的时候如果设置了就free iovec等，看起来fast_iov是现成的，iov是新创建的，不能简单判空来处理，所以通过flag</p>
+<p>异常退出的时候没有单独对所有额外申请的内存做释放，通过REQ_F_NEED_CLEANUP这样来统一管理所有op的异常释放</p>
 <h2> [361] e96e977992d0 - io_uring: remove unused struct io_async_open</h2>
 <h2> [360] 63e5d81f72af - io_uring: flush overflowed CQ events in the io_uring_poll()</h2>
 <h2> [359] cf3040ca55f2 - io_uring: statx/openat/openat2 don't support fixed files</h2>
