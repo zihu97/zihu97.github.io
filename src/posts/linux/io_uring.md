@@ -3184,6 +3184,7 @@ tee io_uring.commit.list
 ## [409] d7718a9d25a6 - io_uring: use poll driven retry for files that support it
 ## [408] 8a72758c51f8 - io_uring: mark requests that we can do poll async in io_op_defs
 ## [407] b41e98524e42 - io_uring: add per-task callback handler
+
 ## [406] c2f2eb7d2c1c - io_uring: store io_kiocb in wait->private
 ## [405] 3684f2465353 - io-wq: use BIT for ulong hash
 ## [404] 5eae8619907a - io_uring: remove IO_WQ_WORK_CB
@@ -3192,26 +3193,114 @@ tee io_uring.commit.list
 ## [401] b0a20349f212 - io_uring: clean io_poll_complete
 ## [400] 7d67af2c0134 - io_uring: add splice(2) support
 ## [399] 8da11c19940d - io_uring: add interface for getting files
+
+rt
+
+
+
 ## [398] bcaec089c5b6 - io_uring: remove req->in_async
+
+io_complete_rw和__io_complete_rw的区别在于前者不会触发nxt,req->in_async仅仅用来选择选择前者还是后者，TODO没看懂kiocb_done这个函数调用时机是什么意思
+
+
+
 ## [397] deb6dc054488 - io_uring: don't do full *prep_worker() from io-wq
+
+提供了功能相同去掉多余检查的io_prep_async_work的简化版本io_prep_next_work,减少io_req_work_grab_env中多余的耗时
+
+
+
 ## [396] 5ea62161167e - io_uring: don't call work.func from sync ctx
+
+rt，统一了走io worker的行为范式
+
+
+
 ## [395] e441d1cf20e1 - io_uring: io_accept() should hold on to submit reference on retry
+
+TODO没看懂这个改动意义是啥
+
+
+
 ## [394] 29de5f6a3507 - io_uring: consider any io_read/write -EAGAIN as final
+
+之前是返回-EAGAIN的io只有用户要求no_wait或者支持async且不在异步workqueue中才允许重拾，现在是一律重试
+
+
+
 ## [393] 80ad894382bf - io-wq: remove io_wq_flush and IO_WQ_WORK_INTERNAL
+
+rt
+
+
+
 ## [392] fc04c39bae01 - io-wq: fix IO_WQ_WORK_NO_CANCEL cancellation
+
+cancel情况下执行work->func，但是回调可能会继续执行req->next,原代码只会执行当前的work不会执行下一个
+
+
+
 ## [391] d87683620489 - io_uring: fix 32-bit compatability with sendmsg/recvmsg
 ## [390] bebdb65e0772 - io_uring: define and set show_fdinfo only if procfs is enabled
+
+rt
+
+
+
 ## [389] dd3db2a34cff - io_uring: drop file set ref put/get on switch
+
+目标是在atomic模式下不增加引用，在percpu模式下增加引用，原来通过FFD_F_ATOMIC确保在atomic模式下释放引用，然后在切换percpu后flush work，再增加引用
+
+现在是没必要通过FFD_F_ATOMIC来确保引用，因此只要在切换到atomic后，通过释放引用在必要时（降到0会调用io_file_data_ref_zero）来自动切换到percpu mode，之后再增加引用（这样不管是atomic还是percpu都能满足ref计数的要求
+
+
+
 ## [388] 3a9015988b3d - io_uring: import_single_range() returns 0/-ERROR
+
+rt
+
+
+
 ## [387] 2a44f4678161 - io_uring: pick up link work on submit reference drop
+
+在__io_queue_sqe中当前req不管成功还是失败依旧可以继续找下一个req，然后继续执行，之前是只有成功了才找下一个
+
+将io_put_req_find_next改为只有在当前req真正完成或者fail时才找下一个req，避免每一次都反复查找下一个req
+
+
+
 ## [386] 2d141dd2caa7 - io-wq: ensure work->task_pid is cleared on init
 ## [385] 3030fd4cb783 - io-wq: remove spin-for-work optimization
+
+rt
+
+
+
 ## [384] bdcd3eab2a9a - io_uring: fix poll_list race for SETUP_IOPOLL|SETUP_SQPOLL
+
+一方面是fio使用SETUP_IOPOLL|SETUP_SQPOLL时，因为不会再下发io_uring_enter，所以不会新的ioctl携带IORING_ENTER_SQ_WAKEUP来唤醒内核线程，因此在iopoll的过程中判断是否有SQPOLL，如果是就主动唤醒
+
+使用list_empty(&ctx->poll_list)的tricky方式来替代ctx->flags & IORING_SETUP_IOPOLL的判断，如果是iopoll + poll_list有任务那么需要判断poll_list，如果是!iopoll那么poll_list也没任务，所以可以通过poll_list来判断要poll和非poll的情况
+
+通过list_empty_careful(&ctx->poll_list)来处理如果当前正有任务要添加到poll_list的情况，为什么这里检查了就能保证一定没问题TODO
+
+
+
 ## [383] 41726c9a50e7 - io_uring: fix personality idr leak
+
+rt
+
+
+
 ## [382] 193155c8c942 - io_uring: handle multiple personalities in link chains
+
+如同之前的思想，每一次io_submit_sqe都保存sqe->personality到req->work.creds，因为只有link list的第一个会马上开始，但是其后的不是因此会取当前的cred但并不代表一定是和sqe的一样，所以还是要每个都保存一份
+
+
+
 ## [381] c7849be9cc2d - io_uring: fix __io_iopoll_check deadlock in io_sq_thread
 
-
+在SETUP_IOPOLL和SETUP_SQPOLL同时设置的情况下，可能进入__io_iopoll_check，但因为之前[88] a3a0e43fd770 增加了检查导致有可能永远不处理cqe，导致io_sq_thread反复进入不退出，所以在这种场景下去掉了之前的检查，因为这种场景已经提前判断了poll_list非空所以不需要检查,TODO不过还需要理解下场景
 
 
 
@@ -5059,6 +5148,8 @@ io_poll_queue_proc - add_wait_queue
 用kthread（io_sq_thread）来自动获取sq_ring，同时支持用IORING_SETUP_SQ_AFF来绑核
 
 <u>支持设置超时时间，超时后设置IORING_SQ_NEED_WAKEUP，进入wait状态，需要用户重新下发io_uring_enter系统调用带上IORING_ENTER_SQ_WAKEUP才会重新唤醒</u>
+
+设置IORING_SQ_NEED_WAKEUP之后需要再判断一次是否有新的sqe，因为用户态的流程是填充sqe->写sq tail->判断是否设置IORING_SQ_NEED_WAKEUP->选择下发io_uring_enter，如果用户处在判断完成后下发的过程，那么就可能会丢失下发的job导致没有唤醒，因此此时需要再判断一次，而其他场景下因为驱动设置了（那么用户态一定会看到）用户态会在接下来流程中检查一次因此就不存在问题
 
 ```
 IORING_SETUP_SQPOLL  - io_sq_thread(内核线程)          - io_submit_sqes - io_submit_sqe
