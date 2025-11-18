@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Tue, 18 Nov 2025 13:41:18 GMT</pubDate>
-    <lastBuildDate>Tue, 18 Nov 2025 13:41:18 GMT</lastBuildDate>
+    <pubDate>Tue, 18 Nov 2025 14:02:47 GMT</pubDate>
+    <lastBuildDate>Tue, 18 Nov 2025 14:02:47 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -101,7 +101,7 @@ QEMU等VMM利用这些接口来探测和理解物理设备的布局，以便在�
 <p>综上所述，<code>vfio-pci</code> 不仅仅是一个驱动，更是现代虚拟化技术实现高性能、安全设备直通的核心基石。</p>
 <h2> 关于作者</h2>
 <p>大家好，我是宝爷，浙大本科、前华为工程师、现某芯片公司系统架构负责人，关注个人成长。</p>
-<p>新的图解文章都在公众号《宝爷说》首发，别忘记关注了哦！</p>
+<p>新的图解文章都在公众号「宝爷说」首发，别忘记关注了哦！</p>
 <p>感谢你读到这里。</p>
 <p>如果这篇文章对您有所帮助，欢迎点赞、分享或收藏！你的支持是我创作的动力！</p>
 <p>如果您不想错过未来的更新，记得点个星标 ⭐，下次我更新你就能第一时间收到推送啦。</p>
@@ -174,8 +174,10 @@ QEMU等VMM利用这些接口来探测和理解物理设备的布局，以便在�
 <p>VFIO通过这种Container -&gt; Group -&gt; Device的逐层授权和关联机制，构建了一个安全、隔离的用户空间设备访问模型，是现代虚拟化技术不可或缺的一环。</p>
 <h2> 关于作者</h2>
 <p>大家好，我是宝爷，浙大本科、前华为工程师、现某芯片公司系统架构负责人，关注个人成长。</p>
-<p>新的图解文章都在公众号首发，别忘记关注了哦！</p>
-<figure><figcaption></figcaption></figure>
+<p>新的图解文章都在公众号「宝爷说」首发，别忘记关注了哦！</p>
+<p>感谢你读到这里。</p>
+<p>如果这篇文章对您有所帮助，欢迎点赞、分享或收藏！你的支持是我创作的动力！</p>
+<p>如果您不想错过未来的更新，记得点个星标 ⭐，下次我更新你就能第一时间收到推送啦。</p>
 ]]></content:encoded>
     </item>
     <item>
