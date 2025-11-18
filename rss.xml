@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Tue, 18 Nov 2025 13:36:01 GMT</pubDate>
-    <lastBuildDate>Tue, 18 Nov 2025 13:36:01 GMT</lastBuildDate>
+    <pubDate>Tue, 18 Nov 2025 13:41:18 GMT</pubDate>
+    <lastBuildDate>Tue, 18 Nov 2025 13:41:18 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -26,9 +26,9 @@
 <p>本文将深入解析 <code>vfio-pci</code> 驱动的内部工作机制，从一个PCI设备如何被该驱动“捕获”，到用户空间（如QEMU）如何通过 <code>vfio_pci_ops</code> 接口查询设备信息、配置中断、并最终实现高性能的I/O访问。</p>
 <p><strong>核心分析：<code>vfio_pci_init</code> 与驱动绑定</strong></p>
 <p><code>vfio-pci</code> 作为一个标准的PCI驱动程序，其入口点是 <code>vfio_pci_init</code> 函数。此函数的核心任务是向Linux内核的PCI子系统注册一个 <code>pci_driver</code> 结构体，即 <code>vfio_pci_driver</code>。</p>
-<figure><figcaption>alt text</figcaption></figure>
+<figure><figcaption></figcaption></figure>
 <p>当用户通过 <code>sysfs</code> 将一个PCI设备从其原始驱动解绑，并绑定到 <code>vfio-pci</code> 驱动时，PCI核心会调用 <code>vfio_pci_driver</code> 中注册的 <code>.probe</code> 回调函数——<code>vfio_pci_probe</code>。此函数是设备生命周期的起点，负责将一个物理PCI设备转化为VFIO框架可识别和管理的 <code>vfio_device</code>。</p>
-<figure><figcaption>alt text</figcaption></figure>
+<figure><figcaption></figcaption></figure>
 <p><code>vfio_pci_probe</code> 的关键步骤如下：</p>
 <ol>
 <li><strong>初始化设备操作集</strong>: 在 <code>vfio_pci_core_init_device</code> 函数中，将 <code>vfio_pci_ops</code> 这个包含了所有PCI设备具体操作的函数指针集，赋值给 <code>vfio_device</code> 结构。自此，来自VFIO核心层的通用设备操作请求，就能准确地路由到 <code>vfio-pci</code> 的具体实现中。</li>
@@ -36,18 +36,18 @@
 </ol>
 <h2> 分步详解：<code>vfio_pci_ops</code> 的实现</h2>
 <p><code>vfio_pci_ops</code> 是连接VFIO核心与PCI物理设备的桥梁，它实现了用户空间对设备进行完整控制所需的所有接口。</p>
-<figure><figcaption>alt text</figcaption></figure>
+<figure><figcaption></figcaption></figure>
 <h3> <strong>设备打开与初始化 (<code>open_device</code>)</strong></h3>
-<figure><figcaption>alt text</figcaption></figure>
+<figure><figcaption></figcaption></figure>
 <p>当用户空间通过 <code>VFIO_GROUP_GET_DEVICE_FD</code> ioctl 第一次打开设备时，<code>vfio_pci_open_device</code> 函数会被调用。它会触发 <code>vfio_pci_core_enable</code>，执行关键的设备初始化操作：</p>
 <ul>
 <li><code>pci_enable_device</code>: 激活设备，为其分配资源。</li>
 <li><code>pci_try_reset_function</code>: 尝试对设备执行Function-Level Reset (FLR)，使其处于一个干净的初始状态。</li>
-<li><code>vfio_config_init</code>: <strong>读取设备的PCI配置空间，并将其完整内容缓存到内核内存中（<code>vdev-&gt;vconfig</code>）</strong>。这一步至关重要，因为它为后续模拟和虚拟化配置空间访问提供了基础。</li>
+<li><code>vfio_config_init</code>: 读取设备的PCI配置空间，并将其完整内容缓存到内核内存中（<code>vdev-&gt;vconfig</code>）。这一步至关重要，因为它为后续模拟和虚拟化配置空间访问提供了基础。</li>
 </ul>
 <h3> <strong>核心控制接口 (<code>ioctl</code>)</strong></h3>
 <p><code>ioctl</code> 是用户空间对设备进行配置和管理的主要手段，由 <code>vfio_pci_core_ioctl</code> 函数处理。</p>
-<figure><figcaption>alt text</figcaption></figure>
+<figure><figcaption></figcaption></figure>
 <ul>
 <li><strong>资源发现</strong>:
 <ul>
@@ -58,7 +58,7 @@ QEMU等VMM利用这些接口来探测和理解物理设备的布局，以便在�
 </ul>
 </li>
 </ul>
-<figure><figcaption>alt text</figcaption></figure>
+<figure><figcaption></figcaption></figure>
 <ul>
 <li>
 <p><strong>中断配置 (<code>VFIO_DEVICE_SET_IRQS</code>)</strong>:</p>
@@ -67,7 +67,7 @@ QEMU等VMM利用这些接口来探测和理解物理设备的布局，以便在�
 <li>用户空间创建一个或多个 <code>eventfd</code> 文件描述符。</li>
 <li>通过 <code>VFIO_DEVICE_SET_IRQS</code> ioctl，并使用 <code>VFIO_IRQ_SET_DATA_EVENTFD</code> 标志，将这些 <code>eventfd</code> 与设备的特定硬件中断向量关联起来。</li>
 <li><code>vfio-pci</code> 内核驱动收到请求后，会向PCIe子系统申请中断资源（<code>pci_alloc_irq_vectors</code>）。</li>
-<li>然后，它调用 <code>request_irq</code> <strong>注册一个内核中断处理函数</strong>（如 <code>vfio_msihandler</code>）。</li>
+<li>然后，它调用 <code>request_irq</code> 注册一个内核中断处理函数（如 <code>vfio_msihandler</code>）。</li>
 <li>当物理设备产生硬件中断时，内核的 <code>vfio_msihandler</code> 会被触发。该处理函数的核心任务就是向用户空间传递的 <code>eventfd</code> 发送一个信号。</li>
 <li>在用户空间，一个等待该 <code>eventfd</code> 的线程（如QEMU的I/O线程）会被唤醒。该线程随后可以将这个中断注入到Guest VM中。
 如思维导图所述，这一机制完美实现了**“注册中断以及回调函数，用于向VM里注入中断”**的目的。</li>
@@ -76,7 +76,7 @@ QEMU等VMM利用这些接口来探测和理解物理设备的布局，以便在�
 </ul>
 <h3> <strong>数据通路：内存映射与I/O (<code>mmap</code>, <code>read</code>, <code>write</code>)</strong></h3>
 <p>这些接口构成了设备访问的数据平面。</p>
-<figure><figcaption>alt text</figcaption></figure>
+<figure><figcaption></figcaption></figure>
 <ul>
 <li>
 <p><strong><code>mmap</code></strong>: 这是实现高性能MMIO（Memory-Mapped I/O）访问的关键。用户空间可以通过 <code>mmap</code> 系统调用，将设备的BAR空间直接映射到自己的虚拟地址空间。<code>vfio_pci_core_mmap</code> 会设置相应的VMA操作集（<code>vma-&gt;vm_ops = &amp;vfio_pci_mmap_ops</code>），使得用户空间的读写操作可以绕过内核，像访问普通内存一样直接访问设备硬件，从而获得极高的性能。</p>
