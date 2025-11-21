@@ -6,12 +6,95 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Wed, 19 Nov 2025 14:11:38 GMT</pubDate>
-    <lastBuildDate>Wed, 19 Nov 2025 14:11:38 GMT</lastBuildDate>
+    <pubDate>Fri, 21 Nov 2025 13:52:23 GMT</pubDate>
+    <lastBuildDate>Fri, 21 Nov 2025 13:52:23 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
     <category>tool</category>
+    <item>
+      <title>VFIO框架源码分析（四）- VFIO-MDEV设备虚拟化的新篇章</title>
+      <link>https://zihu97.github.io/posts/linux/vfio/vfio-mdev.html</link>
+      <guid>https://zihu97.github.io/posts/linux/vfio/vfio-mdev.html</guid>
+      <source url="https://zihu97.github.io/rss.xml">VFIO框架源码分析（四）- VFIO-MDEV设备虚拟化的新篇章</source>
+      <description>VFIO框架源码分析（四）- VFIO-MDEV设备虚拟化的新篇章 引言与整体框架 我们之前讨论的 vfio-pci 实现了设备的物理直通，它功能强大但存在一个核心限制：独占性。一个物理设备一旦被分配给一个虚拟机，其他虚拟机或宿主机便无法再使用它。为了解决这一问题，内核引入了MDEV（Mediated Device）框架。MDEV 是一种设备虚拟化技术，允许一个物理设备（Parent Device）被“分割”成多个独立的虚拟设备（Mediated Devices），这些虚拟设备可以被独立地分配给不同的虚拟机，从而实现单张物理卡（如GPU、FPGA）的多用户共享。</description>
+      <category>tech</category>
+      <pubDate>Fri, 21 Nov 2025 00:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[<h1> VFIO框架源码分析（四）- VFIO-MDEV设备虚拟化的新篇章</h1>
+<h2> 引言与整体框架</h2>
+<p>我们之前讨论的 <code>vfio-pci</code> 实现了设备的物理直通，它功能强大但存在一个核心限制：独占性。一个物理设备一旦被分配给一个虚拟机，其他虚拟机或宿主机便无法再使用它。为了解决这一问题，内核引入了<code>MDEV</code>（Mediated Device）框架。<code>MDEV</code> 是一种设备虚拟化技术，允许一个物理设备（Parent Device）被“分割”成多个独立的虚拟设备（Mediated Devices），这些虚拟设备可以被独立地分配给不同的虚拟机，从而实现单张物理卡（如GPU、FPGA）的多用户共享。</p>
+<p><code>vfio-mdev</code> 模块正是连接通用 <code>MDEV</code> 框架与 VFIO 体系的桥梁。本文将深入解析<code>MDEV</code>的核心机制以及 <code>vfio-mdev</code> 驱动如何将一个被虚拟出来的 <code>mdev</code> 设备封装成标准的 <code>vfio_device</code>，最终呈现给用户空间。</p>
+<p><strong>核心分析：MDEV框架与VFIO驱动的双层结构</strong></p>
+<p><code>vfio-mdev</code> 的实现依赖于两个协同工作的核心组件：通用的 <code>MDEV</code> 框架和专用的 <code>vfio-mdev</code> 驱动。</p>
+<figure><figcaption></figcaption></figure>
+<ol>
+<li><strong>MDEV核心框架 (<code>mdev_init</code>)</strong>:
+此框架独立于VFIO，提供了一套通用的、用于创建和管理虚拟设备的基础设施。它的初始化过程主要完成：
+<ul>
+<li><strong>注册MDEV总线 (<code>mdev_bus_register</code>)</strong>: 创建一个名为 <code>mdev</code> 的新总线类型。所有通过 <code>MDEV</code> 框架创建的虚拟设备都将挂载在这条总线上。</li>
+<li><strong>注册VFIO的MDEV驱动 (<code>mdev_register_driver</code>)</strong>: 将 <code>vfio_mdev_driver</code> 注册到内核中。这个驱动的作用就是等待并绑定到任何出现在 <code>mdev</code> 总线上的新设备。</li>
+</ul>
+</li>
+</ol>
+<figure><figcaption></figcaption></figure>
+<ol start="2">
+<li><strong>物理设备驱动的集成 (<code>mdev_register_device</code>)</strong>:
+<code>MDEV</code> 框架本身不创造虚拟设备，它需要物理设备驱动（如Intel的 <code>i915</code> GVT-g驱动）主动注册其虚拟化的能力。
+<ul>
+<li>物理驱动调用 <code>mdev_register_device</code> 来声明它支持创建 <code>mdev</code>。</li>
+<li>这一调用会通过 <code>parent_create_sysfs_files</code> 在该物理设备的 <code>sysfs</code> 目录下创建 <code>mdev_supported_types</code> 目录。</li>
+<li>目录下包含了该物理设备支持创建的 <code>mdev</code> 类型（例如 <code>i915-GVTg_V5_4</code>），每种类型下都有一个名为 <code>create</code> 的 <code>sysfs</code> 属性文件。用户空间正是通过向这个<code>create</code>文件写入一个UUID来动态创建一个<code>mdev</code>实例。</li>
+</ul>
+</li>
+</ol>
+<h2> 分步详解：从Sysfs创建到VFIO设备</h2>
+<h3> <strong>第一步：MDEV设备的诞生 (<code>create_store</code>)</strong></h3>
+<figure><figcaption></figcaption></figure>
+<p>当用户在 <code>sysfs</code> 中向特定类型的 <code>create</code> 文件写入一个UUID时，内核会调用其回调函数 <code>create_store</code>。</p>
+<ul>
+<li><code>create_store</code> 内部调用 <code>mdev_device_create</code>。</li>
+<li><code>mdev_device_create</code> 函数会：
+<ol>
+<li>调用物理设备驱动提供的 <code>.create</code> 回调函数，由物理驱动负责分配和初始化代表虚拟设备的内部数据结构。</li>
+<li>创建一个标准的 <code>device</code> 结构体，并将其注册到前文提到的 <code>mdev</code> 总线上。</li>
+</ol>
+</li>
+</ul>
+<h3> <strong>第二步：VFIO驱动的探测与绑定 (<code>vfio_mdev_probe</code>)</strong></h3>
+<figure><figcaption></figcaption></figure>
+<p>一旦新的 <code>mdev</code> 设备出现在 <code>mdev</code> 总线上，总线核心会自动为其寻找匹配的驱动。由于 <code>vfio_mdev_driver</code> 是注册在该总线上的驱动，其 <code>.probe</code> 函数 <code>vfio_mdev_probe</code> 将被执行。</p>
+<ul>
+<li><code>vfio_mdev_probe</code> 是连接 <code>MDEV</code> 和 VFIO 的关键枢纽。</li>
+<li>它调用 <code>vfio_init_group_dev</code>，这是一个我们熟悉的函数（在<code>vfio-pci</code>分析中也见过），它的作用是为这个 <code>mdev</code> 设备创建一个对应的 <code>vfio_group_dev</code>（即<code>vfio_device</code>）。</li>
+<li>在初始化过程中，它将 <code>vfio_mdev_dev_ops</code> 这套操作函数集与新创建的 <code>vfio_device</code> 关联起来。</li>
+<li>这一步的逻辑与物理设备被 <code>vfio-pci</code> 绑定时的流程高度相似，最终都产出了一个标准的、可被VFIO核心层管理的 <code>vfio_device</code>。</li>
+</ul>
+<h3> <strong>第三步：代理模式 (<code>vfio_mdev_dev_ops</code>)</strong></h3>
+<p><code>vfio_mdev_dev_ops</code> 的实现揭示了 <code>vfio-mdev</code> 模块设计的精髓——代理模式（Proxy Pattern）。<code>vfio-mdev</code> 自身不实现任何复杂的设备访问逻辑，它只是一个“中间人”或“转发器”。</p>
+<figure><figcaption></figcaption></figure>
+<p>当用户空间对最终获得的 <code>vfio_device</code> fd进行 <code>open</code>, <code>read</code>, <code>write</code>, <code>ioctl</code> 等操作时，会触发 <code>vfio_mdev_dev_ops</code> 中对应的函数：</p>
+<ul>
+<li>例如，调用 <code>vfio_mdev_open_device</code> 时，它会首先从 <code>vfio_device</code> 找到其背后的 <code>mdev</code> 设备，再通过 <code>mdev</code> 找到创建它的物理设备驱动（<code>parent</code>）。</li>
+<li>然后，它直接调用 <code>parent-&gt;ops-&gt;open_device</code>，将操作请求原封不动地转发给物理设备驱动。</li>
+<li>对于 <code>read</code>, <code>write</code>, <code>ioctl</code> 等所有其他操作，<code>vfio-mdev</code> 都采用完全相同的模式进行转发。</li>
+</ul>
+<p>这意味着，所有关于设备资源虚拟化、多用户隔离、状态保存与恢复等复杂工作，全部由底层的物理设备驱动（如 <code>i915</code>, <code>nvidia</code>）来完成。<code>vfio-mdev</code> 只负责提供标准的VFIO接口封装。</p>
+<h2> 总结</h2>
+<p><code>MDEV</code> 框架与 <code>vfio-mdev</code> 驱动共同构建了一个优雅、解耦的设备虚拟化体系：</p>
+<ol>
+<li><strong>通用框架层 (<code>MDEV</code>)</strong>: 提供了一套标准的、通过 <code>sysfs</code> 创建和管理虚拟设备的机制，与具体总线和驱动无关。</li>
+<li><strong>能力提供层 (物理驱动)</strong>: 真正的物理设备驱动（如Intel GVT-g）负责实现资源切分和虚拟化的核心逻辑，并通过 <code>mdev_register_device</code> 向 <code>MDEV</code> 框架“宣告”自己的能力。</li>
+<li><strong>VFIO适配层 (<code>vfio-mdev</code>)</strong>: 作为一个“胶水”驱动，它自动探测由用户创建的 <code>mdev</code> 实例，将其无缝地包装成一个标准的 <code>vfio_device</code>，并以代理模式将所有设备操作请求转发给底层的物理驱动。</li>
+</ol>
+<p>这种分层设计极大地简化了设备虚拟化的集成工作。任何硬件厂商只要实现其物理驱动对 <code>MDEV</code> 接口的支持，就能立即利用 <code>vfio-mdev</code> 模块，将其设备共享能力接入到成熟、健壮的VFIO生态中，供QEMU等用户空间程序使用。</p>
+<h2> 关于作者</h2>
+<p>大家好，我是宝爷，浙大本科、前华为工程师、现某芯片公司系统架构负责人，关注个人成长。</p>
+<p>新的图解文章都在公众号「宝爷说」首发，别忘记关注了哦！</p>
+<p>感谢你读到这里。</p>
+<p>如果这篇文章对您有所帮助，欢迎点赞、分享或收藏！你的支持是我创作的动力！</p>
+<p>如果您不想错过未来的更新，记得点个星标 ⭐，下次我更新你就能第一时间收到推送啦。</p>
+]]></content:encoded>
+    </item>
     <item>
       <title>VFIO框架源码分析（三）- IOMMU后端Type1驱动与DMA隔离</title>
       <link>https://zihu97.github.io/posts/linux/vfio/vfio-iommu-type1.html</link>
