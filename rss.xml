@@ -6,8 +6,8 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Sat, 22 Nov 2025 04:55:56 GMT</pubDate>
-    <lastBuildDate>Sat, 22 Nov 2025 04:55:56 GMT</lastBuildDate>
+    <pubDate>Sat, 22 Nov 2025 05:30:40 GMT</pubDate>
+    <lastBuildDate>Sat, 22 Nov 2025 05:30:40 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
@@ -19,7 +19,7 @@
       <source url="https://zihu97.github.io/rss.xml">VFIO框架源码分析（六）- NVIDIA vGPU驱动剖析（上）：前端-后端架构与初始化</source>
       <description>VFIO框架源码分析（六）- NVIDIA vGPU驱动剖析（上）：前端-后端架构与初始化 引言与整体框架 NVIDIA vGPU技术是数据中心GPU虚拟化的行业标杆，它允许将单块物理GPU的强大能力“分割”并同时赋能给多个虚拟机。nvidia-vgpu-vfio 内核模块是实现这一魔法的关键组件，它扮演着连接NVIDIA专有GPU驱动与Linux标准VFIO/MDEV虚拟化框架的“适配器”角色。 本文（上篇）将基于NVIDIA-Linux-x86_64-460.73.01-grid-vgpu-kvm版本，深入分析nvidia-vgpu-vfio驱动的顶层设计，重点解读其精妙的“前端-后端”解耦架构，以及在模块初始化和探测（Probe）阶段，它是如何与NVIDIA核心驱动建立通信、并向Linux内核注册自身虚拟化能力的。</description>
       <category>tech</category>
-      <pubDate>Sat, 22 Nov 2025 00:00:00 GMT</pubDate>
+      <pubDate>Sun, 23 Nov 2025 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[<h1> VFIO框架源码分析（六）- NVIDIA vGPU驱动剖析（上）：前端-后端架构与初始化</h1>
 <h2> 引言与整体框架</h2>
 <p>NVIDIA vGPU技术是数据中心GPU虚拟化的行业标杆，它允许将单块物理GPU的强大能力“分割”并同时赋能给多个虚拟机。<code>nvidia-vgpu-vfio</code> 内核模块是实现这一魔法的关键组件，它扮演着连接NVIDIA专有GPU驱动与Linux标准VFIO/MDEV虚拟化框架的“适配器”角色。</p>
@@ -75,16 +75,17 @@
       <link>https://zihu97.github.io/posts/linux/virtualization/nvidia-vgpu-vfio/nvidia-vgpu-vfio(%E4%B8%8B)%20.html</link>
       <guid>https://zihu97.github.io/posts/linux/virtualization/nvidia-vgpu-vfio/nvidia-vgpu-vfio(%E4%B8%8B)%20.html</guid>
       <source url="https://zihu97.github.io/rss.xml">VFIO框架源码分析（七）- NVIDIA vGPU驱动剖析（下）：虚拟设备生命周期与I/O实现</source>
-      <description>VFIO框架源码分析（七）- NVIDIA vGPU驱动剖析（下）：虚拟设备生命周期与I/O实现 引言与整体框架 在本文的上篇中，我们分析了nvidia-vgpu-vfio驱动如何通过一个精巧的“前端-后端”架构完成初始化，并向Linux MDEV框架注册了其GPU虚拟化能力。这个注册过程的核心是提供了一个名为vgpu_fops的操作函数集。 本文（下篇）将聚焦于vgpu_fops，详细剖析一个vGPU实例从诞生到被虚拟机（VM）实际使用，再到最终销毁的完整生命周期。我们将看到，用户空间的每一个VFIO操作，是如何通过vgpu_fops中的函数，最终被精确地转发和实现。</description>
+      <description>VFIO框架源码分析（七）- NVIDIA vGPU驱动剖析（下）：虚拟设备生命周期与I/O实现 引言与整体框架 在上篇中，我们分析了nvidia-vgpu-vfio驱动如何通过一个精巧的“前端-后端”架构完成初始化，并向Linux MDEV框架注册了其GPU虚拟化能力。这个注册过程的核心是提供了一个名为vgpu_fops的操作函数集。 本文（下篇）将聚焦于vgpu_fops，详细剖析一个vGPU实例从诞生到被虚拟机（VM）实际使用，再到最终销毁的完整生命周期。我们将看到，用户空间的每一个VFIO操作，是如何通过vgpu_fops中的函数，最终被精确地转发和实现。</description>
       <category>tech</category>
-      <pubDate>Sat, 22 Nov 2025 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 24 Nov 2025 00:00:00 GMT</pubDate>
       <content:encoded><![CDATA[<h1> VFIO框架源码分析（七）- NVIDIA vGPU驱动剖析（下）：虚拟设备生命周期与I/O实现</h1>
 <h2> 引言与整体框架</h2>
-<p>在本文的上篇中，我们分析了<code>nvidia-vgpu-vfio</code>驱动如何通过一个精巧的“前端-后端”架构完成初始化，并向Linux MDEV框架注册了其GPU虚拟化能力。这个注册过程的核心是提供了一个名为<code>vgpu_fops</code>的操作函数集。</p>
+<p>在上篇中，我们分析了<code>nvidia-vgpu-vfio</code>驱动如何通过一个精巧的“前端-后端”架构完成初始化，并向Linux MDEV框架注册了其GPU虚拟化能力。这个注册过程的核心是提供了一个名为<code>vgpu_fops</code>的操作函数集。</p>
 <p>本文（下篇）将聚焦于<code>vgpu_fops</code>，详细剖析一个vGPU实例从诞生到被虚拟机（VM）实际使用，再到最终销毁的完整生命周期。我们将看到，用户空间的每一个VFIO操作，是如何通过<code>vgpu_fops</code>中的函数，最终被精确地转发和实现。</p>
-<h4> <strong>核心分析：vGPU生命周期管理者<code>vgpu_fops</code></strong></h4>
+<p><strong>核心分析：vGPU生命周期管理者<code>vgpu_fops</code></strong></p>
 <p><code>vgpu_fops</code>是<code>nvidia-vgpu-vfio</code>驱动的核心，它是一个<code>mdev_driver_ops</code>结构体，实现了MDEV框架要求的所有回调函数。它定义了对vGPU实例进行全生命周期管理以及数据交互所需的一切。从用户在<code>sysfs</code>中创建vGPU，到QEMU通过VFIO <code>ioctl</code>/<code>mmap</code>等接口操作vGPU，所有行为的入口点都在这里。</p>
-<h4> <strong>分步详解：从创建到高性能I/O</strong></h4>
+<h2> <strong>分步详解：从创建到高性能I/O</strong></h2>
+<figure><figcaption></figcaption></figure>
 <p><strong>1. vGPU的诞生 (<code>.create</code> -&gt; <code>nv_vgpu_vfio_create</code>)</strong></p>
 <p>当管理员向<code>sysfs</code>的<code>create</code>文件写入一个UUID时，MDEV框架会调用<code>.create</code>回调，即<code>nv_vgpu_vfio_create</code>。此函数负责vGPU实例的创建和初始化：</p>
 <ul>
@@ -98,6 +99,7 @@
 </li>
 </ul>
 <p><strong>2. vGPU的启用 (<code>.open_device</code> -&gt; <code>nv_vgpu_vfio_open</code>)</strong></p>
+<figure><figcaption></figcaption></figure>
 <p>当QEMU/VFIO打开vGPU设备文件描述符时，<code>.open_device</code>回调，即<code>nv_vgpu_vfio_open</code>会被触发。这标志着虚拟机即将开始使用该vGPU。</p>
 <ul>
 <li><strong>启动vGPU</strong>: 一个关键操作是调用后端的<code>rm_vgpu_vfio_ops.vgpu_start</code>函数，通知核心驱动，该vGPU实例已被激活，可以开始处理来自虚拟机的指令。</li>
@@ -105,25 +107,27 @@
 </ul>
 <p><strong>3. vGPU的数据交互 (I/O操作)</strong></p>
 <p>这是体现vGPU性能和功能的核心部分，主要由<code>.read</code>, <code>.write</code>, 和 <code>.mmap</code>处理。</p>
+<figure><figcaption></figcaption></figure>
 <ul>
-<li>
-<p><strong>寄存器访问 (<code>.read</code>/<code>.write</code> -&gt; <code>nv_vgpu_vfio_access</code>)</strong>:
-此函数是一个分发器，根据访问的Region（区域）执行不同逻辑：</p>
+<li><strong>寄存器访问 (<code>.read</code>/<code>.write</code> -&gt; <code>nv_vgpu_vfio_access</code>)</strong>:
+此函数是一个分发器，根据访问的Region（区域）执行不同逻辑：
 <ul>
 <li><strong>PCI配置空间 (<code>VFIO_PCI_CONFIG_REGION_INDEX</code>)</strong>: 请求被转发到<code>nv_vgpu_vfio_hw_config_access</code>，它通过<code>pci_read/write_config_dword</code>直接读写真实的PCI配置空间寄存器。这表明NVIDIA vGPU为VM提供了高度仿真的PCI设备视图。</li>
 <li><strong>BAR空间 (<code>VFIO_PCI_BARx_REGION_INDEX</code>)</strong>: 请求被转发到<code>vgpu_read_base</code>等函数，这会访问由后端驱动维护的虚拟BAR空间缓存（<code>vgpu_dev-&gt;vconfig</code>），实现了对设备MMIO空间的虚拟化。</li>
 </ul>
 </li>
-<li>
-<p><strong>高性能显存访问 (<code>.mmap</code> -&gt; <code>nv_vgpu_vfio_mmap</code>)</strong>:
-这是图形性能的关键。当QEMU请求<code>mmap</code> vGPU的显存BAR（通常是<code>BAR1</code>）时，<code>nv_vgpu_vfio_mmap</code>被调用。</p>
+</ul>
+<figure><figcaption></figcaption></figure>
 <ul>
-<li>如思维导图所示，它为VMA（Virtual Memory Area）设置了<code>vgpu_mmio_ops</code>操作集。</li>
-<li>这个操作集的核心是<code>vgpu_mmio_fault</code>函数。这是一个<strong>缺页处理函数 (Page Fault Handler)</strong>。这意味着vGPU的显存映射采用了<strong>按需分页 (On-demand Paging)</strong> 的高级技术。只有当虚拟机首次访问某块显存时，才会触发缺页中断，然后由<code>vgpu_mmio_fault</code>函数动态地为其建立物理映射。这种方式极大地优化了内存开销和映射效率，是实现高性能vGPU的基石。</li>
+<li><strong>高性能显存访问 (<code>.mmap</code> -&gt; <code>nv_vgpu_vfio_mmap</code>)</strong>:
+这是图形性能的关键。当QEMU请求<code>mmap</code> vGPU的显存BAR（通常是<code>BAR1</code>）时，<code>nv_vgpu_vfio_mmap</code>被调用。
+<ul>
+<li>它为VMA（Virtual Memory Area）设置了<code>vgpu_mmio_ops</code>操作集。</li>
+<li>这个操作集的核心是<code>vgpu_mmio_fault</code>函数。这是一个缺页处理函数 (Page Fault Handler)。这意味着vGPU的显存映射采用了按需分页 (On-demand Paging)的高级技术。只有当虚拟机首次访问某块显存时，才会触发缺页中断，然后由<code>vgpu_mmio_fault</code>函数动态地为其建立物理映射。这种方式极大地优化了内存开销和映射效率，是实现高性能vGPU的基石。</li>
 </ul>
 </li>
 </ul>
-<h4> <strong>总结</strong></h4>
+<h2> 总结</h2>
 <p><code>vgpu_fops</code>操作集完美地展示了一个生产级MDEV驱动如何将标准的VFIO操作映射到底层复杂的硬件虚拟化逻辑上：</p>
 <ol>
 <li><strong>完整的生命周期管理</strong>: 通过<code>.create</code>, <code>.open_device</code>, <code>.close_device</code>, <code>.remove</code>等回调，实现了vGPU从创建、激活、关闭到销毁的全程管理。</li>
