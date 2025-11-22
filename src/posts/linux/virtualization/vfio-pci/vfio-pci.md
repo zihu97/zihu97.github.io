@@ -57,7 +57,7 @@ tag:
     *   `VFIO_DEVICE_GET_IRQ_INFO`: 获取设备支持的中断类型（INTx, MSI, MSI-X）及其数量。
     QEMU等VMM利用这些接口来探测和理解物理设备的布局，以便在虚拟机中模拟出一个相同的虚拟设备。
 
-![](./image-13.png)
+![](./image-12.png)
 
 *   **中断配置 (`VFIO_DEVICE_SET_IRQS`)**:
 
@@ -74,7 +74,7 @@ tag:
 
 这些接口构成了设备访问的数据平面。
 
-![](./image-12.png)
+![](./image-13.png)
 
 *   **`mmap`**: 这是实现高性能MMIO（Memory-Mapped I/O）访问的关键。用户空间可以通过 `mmap` 系统调用，将设备的BAR空间直接映射到自己的虚拟地址空间。`vfio_pci_core_mmap` 会设置相应的VMA操作集（`vma->vm_ops = &vfio_pci_mmap_ops`），使得用户空间的读写操作可以绕过内核，像访问普通内存一样直接访问设备硬件，从而获得极高的性能。
 
