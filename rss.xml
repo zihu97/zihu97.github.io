@@ -6,21 +6,21 @@
     <link>https://zihu97.github.io/</link>
     <description>紫狐的个人博客</description>
     <language>zh-CN</language>
-    <pubDate>Sun, 23 Nov 2025 06:51:45 GMT</pubDate>
-    <lastBuildDate>Sun, 23 Nov 2025 06:51:45 GMT</lastBuildDate>
+    <pubDate>Mon, 24 Nov 2025 13:26:38 GMT</pubDate>
+    <lastBuildDate>Mon, 24 Nov 2025 13:26:38 GMT</lastBuildDate>
     <generator>vuepress-plugin-feed2</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <category>tech</category>
     <category>tool</category>
     <item>
-      <title>VFIO框架源码分析（十）- 由慢到快：QEMU VFIO 中断机制从 INTx 到 MSI-X 的模拟演进</title>
+      <title>VFIO框架源码分析（十）- QEMU VFIO 中断机制从 INTx 到 MSI-X 的模拟演进</title>
       <link>https://zihu97.github.io/posts/linux/virtualization/qemu/MSI-X/QEMU%20MSIX.html</link>
       <guid>https://zihu97.github.io/posts/linux/virtualization/qemu/MSI-X/QEMU%20MSIX.html</guid>
-      <source url="https://zihu97.github.io/rss.xml">VFIO框架源码分析（十）- 由慢到快：QEMU VFIO 中断机制从 INTx 到 MSI-X 的模拟演进</source>
-      <description>VFIO框架源码分析（十）- 由慢到快：QEMU VFIO 中断机制从 INTx 到 MSI-X 的模拟演进 简介与背景 中断是设备与 CPU 通信的命脉。 在直通场景下，硬件产生物理中断，必须准确、低延迟地投递给虚拟机的 vCPU。 QEMU 必须模拟 PCI 规范定义的三种中断模式：INTx（传统电平中断）、MSI（消息中断）和 MSI-X（扩展消息中断）。 其中，MSI-X 是现代高性能网卡和存储控制器的标配。 如果中断处理路径过长（例如经过 QEMU 用户态转发），会带来巨大的性能抖动。</description>
+      <source url="https://zihu97.github.io/rss.xml">VFIO框架源码分析（十）- QEMU VFIO 中断机制从 INTx 到 MSI-X 的模拟演进</source>
+      <description>VFIO框架源码分析（十）- QEMU VFIO 中断机制从 INTx 到 MSI-X 的模拟演进 简介与背景 中断是设备与 CPU 通信的命脉。 在直通场景下，硬件产生物理中断，必须准确、低延迟地投递给虚拟机的 vCPU。 QEMU 必须模拟 PCI 规范定义的三种中断模式：INTx（传统电平中断）、MSI（消息中断）和 MSI-X（扩展消息中断）。 其中，MSI-X 是现代高性能网卡和存储控制器的标配。 如果中断处理路径过长（例如经过 QEMU 用户态转发），会带来巨大的性能抖动。</description>
       <category>tech</category>
       <pubDate>Thu, 27 Nov 2025 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[<h1> VFIO框架源码分析（十）- 由慢到快：QEMU VFIO 中断机制从 INTx 到 MSI-X 的模拟演进</h1>
+      <content:encoded><![CDATA[<h1> VFIO框架源码分析（十）- QEMU VFIO 中断机制从 INTx 到 MSI-X 的模拟演进</h1>
 <h2> 简介与背景</h2>
 <p>中断是设备与 CPU 通信的命脉。</p>
 <p>在直通场景下，硬件产生物理中断，必须准确、低延迟地投递给虚拟机的 vCPU。</p>
@@ -122,14 +122,14 @@
 ]]></content:encoded>
     </item>
     <item>
-      <title>VFIO框架源码分析（九）- 从 QEMU 到 Kernel：VFIO-PCI 设备实例化 (Realize) 流程全解</title>
+      <title>VFIO框架源码分析（九）- VFIO-PCI 设备实例化 (Realize) 流程全解</title>
       <link>https://zihu97.github.io/posts/linux/virtualization/qemu/VFIO-PCI-Realize/QEMU%20VFIO-PCI-Realize.html</link>
       <guid>https://zihu97.github.io/posts/linux/virtualization/qemu/VFIO-PCI-Realize/QEMU%20VFIO-PCI-Realize.html</guid>
-      <source url="https://zihu97.github.io/rss.xml">VFIO框架源码分析（九）- 从 QEMU 到 Kernel：VFIO-PCI 设备实例化 (Realize) 流程全解</source>
-      <description>VFIO框架源码分析（九）- 从 QEMU 到 Kernel：VFIO-PCI 设备实例化 (Realize) 流程全解 简介与背景 当用户在启动参数中写下 -device vfio-pci,host=0000:01:00.0 时，QEMU 内部发生了一场复杂的“接力跑”。 vfio_realize 函数是将虚拟设备对象与物理硬件真正绑定的核心枢纽。 它不仅要打开设备文件，还要解析硬件资源（BAR、中断），并将其映射到虚拟机的地址空间中。 如果这一步失败，虚拟机将无法启动或无法看到该设备。 逐层代码拆解</description>
+      <source url="https://zihu97.github.io/rss.xml">VFIO框架源码分析（九）- VFIO-PCI 设备实例化 (Realize) 流程全解</source>
+      <description>VFIO框架源码分析（九）- VFIO-PCI 设备实例化 (Realize) 流程全解 简介与背景 当用户在启动参数中写下 -device vfio-pci,host=0000:01:00.0 时，QEMU 内部发生了一场复杂的“接力跑”。 vfio_realize 函数是将虚拟设备对象与物理硬件真正绑定的核心枢纽。 它不仅要打开设备文件，还要解析硬件资源（BAR、中断），并将其映射到虚拟机的地址空间中。 如果这一步失败，虚拟机将无法启动或无法看到该设备。 逐层代码拆解 vfio_realize位于 hw/vfio/pci.c，是 PCIDeviceClass 的 realize 方法实现。它的主要职责是：资源发现、资源映射、错误处理。</description>
       <category>tech</category>
       <pubDate>Wed, 26 Nov 2025 00:00:00 GMT</pubDate>
-      <content:encoded><![CDATA[<h1> VFIO框架源码分析（九）- 从 QEMU 到 Kernel：VFIO-PCI 设备实例化 (Realize) 流程全解</h1>
+      <content:encoded><![CDATA[<h1> VFIO框架源码分析（九）- VFIO-PCI 设备实例化 (Realize) 流程全解</h1>
 <h2> 简介与背景</h2>
 <p>当用户在启动参数中写下 -device vfio-pci,host=0000:01:00.0 时，QEMU 内部发生了一场复杂的“接力跑”。</p>
 <p>vfio_realize 函数是将虚拟设备对象与物理硬件真正绑定的核心枢纽。</p>
