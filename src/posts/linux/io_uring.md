@@ -3170,20 +3170,83 @@ tee io_uring.commit.list
 ## [423] f0e20b894350 - io_uring: fix lockup with timeouts
 ## [422] c1e2148f8ecb - io_uring: free fixed_file_data after RCU grace period
 ## [421] 5a2e745d4d43 - io_uring: buffer registration infrastructure
+
+rt
+
+
+
 ## [420] e9fd939654f1 - io_uring/io-wq: forward submission ref to async
+
+不再需要get_work，看起来只是增加了引用计数，只保留free的流程，无功能变化的优化重构
+
+
+
 ## [419] f462fd36fc43 - io-wq: optimise out *next_work() double lock
 ## [418] 58e393198737 - io-wq: optimise locking in io_worker_handle_work()
 ## [417] dc026a73c722 - io-wq: shuffle io_worker_handle_work() code
+
+TODO优化没怎么看懂
+
+
+
 ## [416] 7a743e225b2a - io_uring: get next work with submission ref drop
+
+确保只有在上一个req仅剩1个引用计数（说明此时req已做完）时才安全发射下一个req
+
+
+
 ## [415] 014db0073cc6 - io_uring: remove @nxt from handlers
 ## [414] 594506fec5fa - io_uring: make submission ref putting consistent
 ## [413] a2100672f3b2 - io_uring: clean up io_close
 ## [412] 8755d97a09fe - io_uring: Ensure mask is initialized in io_arm_poll_handler
 ## [411] 3b17cf5a58f2 - io_uring: remove io_prep_next_work()
 ## [410] 4bc4494ec7c9 - io_uring: remove extra nxt check after punt
+
+rt
+
+
+
 ## [409] d7718a9d25a6 - io_uring: use poll driven retry for files that support it
 ## [408] 8a72758c51f8 - io_uring: mark requests that we can do poll async in io_op_defs
+
+新增了基于poll的重试机制，原先是放到async context，现在是放到task_work里面自动重试，这样也不需要申请async context
+
+以socket读取为例：
+1、
+应用程序通过 io_uring 提交非阻塞的 IORING_OP_RECVMSG 请求
+内核发现 socket 接收缓冲区为空，返回 -EAGAIN
+调用 io_arm_poll_handler 注册监听 POLLIN 事件
+2、
+场景1：TCP 数据到达
+网络包到达网卡
+
+NIC 触发中断，内核网络栈处理 TCP 报文
+数据被存入 socket 的接收缓冲区 (sk_buff)
+唤醒等待队列
+
+内核调用 sock_def_readable()
+遍历 socket 的等待队列 (sk->sk_sleep)，执行注册的 io_async_wake 回调
+
+场景2：Socket 错误
+连接断开/错误
+
+内核设置 sk->sk_err 并标记 POLLERR
+触发等待队列时会携带 EPOLLERR 标志
+3、
+当任务（用户进程）从内核态返回用户态时：
+
+内核检查 task_work
+
+在 exit_to_user_mode_loop() 中调用 task_work_run()
+执行 io_async_task_func
+
+
+
 ## [407] b41e98524e42 - io_uring: add per-task callback handler
+
+通过task work机制自动回调剩下的poll里面的任务，避免原来还要放到async context的处理 TODO（需要再看下这个为什么可以这样做，以及是否可以推广）
+
+
 
 ## [406] c2f2eb7d2c1c - io_uring: store io_kiocb in wait->private
 ## [405] 3684f2465353 - io-wq: use BIT for ulong hash
